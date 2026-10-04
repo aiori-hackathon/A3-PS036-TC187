@@ -1,0 +1,38 @@
+# LadderLens CI — builds the pinned image and runs the 1A smoke proof.
+#
+# NOTE: this machine has no Docker/WSL, so this workflow is currently the ONLY
+# way the 1A environment gets verified. It must pass before any measured claim
+# is made in later phases.
+
+name: build-and-smoke
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Check out LadderLens
+        uses: actions/checkout@v4
+
+      # The Dockerfile builds MTL from the vendored mtl-ref/ tree, which is a
+      # standalone clone that is NOT committed to this repo (see .gitignore).
+      # Re-create it here at the exact pinned commit.
+      - name: Fetch pinned MTL reference (v1.3.1 @ 7cef0191)
+        run: |
+          git clone https://github.com/verisign/MTL mtl-ref
+          git -C mtl-ref checkout 7cef0191da55048111d252a567b7614672424ed3
+          git -C mtl-ref rev-parse HEAD
+
+      - name: Build pinned image (OpenSSL 3.6.0, liboqs 0.16.0, MTL v1.3.1)
+        run: docker build --progress=plain -f docker/Dockerfile -t ladderlens:latest .
+
+      - name: Smoke test — sign + verify one message, print measured sizes
+        run: |
+          docker run --rm -v "$PWD":/work ladderlens:latest \
+            /bin/sh /work/scripts/smoke_test.sh "SLH-DSA-SHA2-128s-MTL-SHA2-128"
