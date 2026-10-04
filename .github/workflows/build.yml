@@ -17,12 +17,14 @@ on:
 
 jobs:
   smoke:
-    runs-on: ubuntu-latest
+    # Pinned runner: ubuntu-latest migrates to Ubuntu 26 on 19 Oct 2026.
+    # ubuntu-24.04 keeps Docker preinstalled and the toolchain stable.
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
 
     steps:
       - name: Check out LadderLens
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7 # current major (v7.0.1, verified via API 2026-10-04)
 
       - name: Build pinned image (OpenSSL 3.6.0, liboqs 0.16.0, MTL v1.3.1)
         run: docker build --progress=plain -f docker/Dockerfile -t ladderlens:latest .
