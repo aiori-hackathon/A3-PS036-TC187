@@ -3,6 +3,10 @@
 # NOTE: this machine has no Docker/WSL, so this workflow is currently the ONLY
 # way the 1A environment gets verified. It must pass before any measured claim
 # is made in later phases.
+#
+# The Dockerfile fetches and SHA-verifies all three pinned components itself
+# (OpenSSL 3.6.0, liboqs 0.16.0, MTL v1.3.1), so no pre-clone step is needed
+# here and a clean `make build` works from a fresh checkout of this repo.
 
 name: build-and-smoke
 
@@ -19,15 +23,6 @@ jobs:
     steps:
       - name: Check out LadderLens
         uses: actions/checkout@v4
-
-      # The Dockerfile builds MTL from the vendored mtl-ref/ tree, which is a
-      # standalone clone that is NOT committed to this repo (see .gitignore).
-      # Re-create it here at the exact pinned commit.
-      - name: Fetch pinned MTL reference (v1.3.1 @ 7cef0191)
-        run: |
-          git clone https://github.com/verisign/MTL mtl-ref
-          git -C mtl-ref checkout 7cef0191da55048111d252a567b7614672424ed3
-          git -C mtl-ref rev-parse HEAD
 
       - name: Build pinned image (OpenSSL 3.6.0, liboqs 0.16.0, MTL v1.3.1)
         run: docker build --progress=plain -f docker/Dockerfile -t ladderlens:latest .

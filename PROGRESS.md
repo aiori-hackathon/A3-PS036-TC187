@@ -43,21 +43,27 @@ Awaiting approval to proceed.
 #### What was done
 - Recorded the MTL reference commit: `mtl-ref` HEAD = `7cef0191da55048111d252a567b7614672424ed3` (tag `MTLLIB_1_3_1` + 5, "Merge pull request #13 from verisign/v1.3.1"; version string hardcoded v1.3.1 at `mtl-ref/src/mtl.h:41`).
 - Resolved exact upstream commit SHAs for dependency pins: OpenSSL 3.6.0 → `7b371d80d959ec9ab4139d09d78e83c090de9779`, liboqs 0.16.0 → `5a1a854b0dc9f2141bdc771c555ee60c37950183` (both verified via GitHub refs API).
-- Wrote `docker/Dockerfile`: multi-stage, pinned by SHA with build-failing `test` checks; MTL built from the vendored `mtl-ref/` tree (no network fetch for MTL); runtime image adds python3 + the lockfile install; pins recorded as ENV vars; 10 numbered RUN layers for diagnosability.
+- Wrote `docker/Dockerfile`: multi-stage; all three pinned components (OpenSSL 3.6.0, liboqs 0.16.0, MTL v1.3.1) are cloned from upstream and SHA-verified at build time with build-failing `test` checks; runtime image adds python3 + the lockfile install; pins recorded as ENV vars; numbered RUN layers for diagnosability.
 - Wrote `.github/workflows/build.yml`: ubuntu-latest build + smoke run — currently the ONLY verification path.
 - Wrote `requirements-lock.txt` (exact pins, cp313 wheels): dnspython 2.7.0, numpy 2.2.6, scipy 1.15.3, pandas 2.2.3, matplotlib 3.10.3.
 - Wrote `Makefile` (`build`, `smoke`, `shell`, `clean`) and `scripts/smoke_test.sh` (keygen → mtlsign batch-of-1 → verify condensed-with-ladder AND verify full-sig, then `stat`-prints measured byte sizes; exits non-zero on rejection per `mtl-ref/examples/mtlverify.c:198`).
-- Initialized git repo at project root (`main` branch). `mtl-ref/` is deliberately NOT committed (nested standalone clone, pinned by SHA; CI re-clones it; README step still to document in 1D). `.gitattributes` forces LF so Windows checkouts can't break the Linux build.
-- Commits: `6a426a1` (1A artifacts), `cef94b9` (PROGRESS), plus CI + status update (this one).
+- Initialized git repo at project root (`main` branch), pushed to https://github.com/adityaa925/ladderlens. `mtl-ref/` is deliberately NOT committed (standalone 1.5 MB reference clone; the build fetches MTL itself, so the clone is not needed to build). `.gitattributes` forces LF so Windows checkouts can't break the Linux build.
+- Commits: `6a426a1`, `cef94b9`, `2628c6a`, then the in-build MTL fetch change (see `git log --oneline`).
 
 #### Verification path (GitHub Actions, awaiting first run)
 `.github/workflows/build.yml` (job `build-and-smoke`, ubuntu-latest):
-1. checkout → 2. clone verisign/MTL into `mtl-ref/` at pinned commit `7cef0191…` (repo ignores the vendored clone) → 3. `docker build --progress=plain` → 4. `docker run` `scripts/smoke_test.sh` with `SLH-DSA-SHA2-128s-MTL-SHA2-128`.
+1. checkout → 2. `docker build --progress=plain` (fetches and SHA-verifies OpenSSL 3.6.0, liboqs 0.16.0, MTL v1.3.1 itself) → 3. `docker run` `scripts/smoke_test.sh` with `SLH-DSA-SHA2-128s-MTL-SHA2-128`.
 Expected: two "Signature ACCEPTED" lines, then measured sizes for pubkey, full_sig, condensed_sig, signed ladder.
 **User will push and paste CI logs back; fix only from real logs (no guessing).**
 
 #### Decision recorded (user, 2026-10-04)
-Docker and WSL are NOT installable on the dev machine. 1A is marked "written, untested"; do NOT mark complete or claim the build works. CI workflow added as the verification path. Dockerfile kept simple and heavily commented (10 numbered layers) so failures are easy to locate.
+Docker and WSL are NOT installable on the dev machine. 1A is marked "written, untested"; do NOT mark complete or claim the build works. CI workflow added as the verification path. Dockerfile kept simple and heavily commented (numbered RUN layers) so failures are easy to locate.
+
+#### Push-coverage check + mtl-ref decision (user request, 2026-10-04)
+- All 9 project files confirmed committed and pushed (`git ls-files`; `main` up to date with `origin/main` @ `2628c6a`). Only `.freebuff/` (local tool state) is untracked, intentionally.
+- `mtl-ref/` confirmed on disk: 29 C/H files, `MTL_LIB_VERSION "v1.3.1"` at src/mtl.h:41, clone @ `7cef0191…`, 1.5 MB — but NOT in the GitHub repo (excluded by `.gitignore:15`), which is why the push was ~10 KiB.
+- Decision: Dockerfile fetches MTL itself at pinned SHA `7cef0191…` with a SHA-verify `test` step (same clone+verify pattern as OpenSSL/liboqs) so `make build` works from a clean clone of this repo with zero extra steps. Vendoring was rejected: it would delete the clone's provenance (.git) and the build still needs the network for the other two deps. CI pre-clone step removed; `.dockerignore` now excludes `mtl-ref` entirely.
+- Status unchanged: 1A remains "written, untested" pending CI logs.
 
 #### CLI facts confirmed from source (file:line)
 - `mtlkeygen <name> <alg>` writes `<name>.key` + `<name>.pub` — examples/mtlkeygen.c:164-170

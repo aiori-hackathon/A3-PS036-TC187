@@ -6,14 +6,18 @@
 # Pinned components (commit SHAs verified against upstream git tags):
 #   OpenSSL 3.6.0   commit 7b371d80d959ec9ab4139d09d78e83c090de9779  (tag openssl-3.6.0)
 #   liboqs  0.16.0  commit 5a1a854b0dc9f2141bdc771c555ee60c37950183  (tag 0.16.0)
-#   MTL     v1.3.1  vendored copy of github.com/verisign/MTL in ../mtl-ref at commit
-#                   7cef0191da55048111d252a567b7614672424ed3
+#   MTL     v1.3.1  commit 7cef0191da55048111d252a567b7614672424ed3
 #                   (MTLLIB_1_3_1 + 5 commits, "Merge pull request #13 from verisign/v1.3.1";
-#                    library version string hardcoded as v1.3.1 in mtl-ref/src/mtl.h:41)
+#                    library version string hardcoded as v1.3.1 in that tree's src/mtl.h:41)
+#
+# All three pinned components are cloned from upstream and verified against
+# their pinned commit SHA at build time, so this image builds identically on
+# any machine. This repo does NOT vendor the MTL source; a local mtl-ref/
+# clone (if present) is reference material only and is not used by this build.
 #
 # Base image is release-pinned fedora-minimal:42 — same base family and the
-# same two dependency versions the reference implementation builds
-# (mtl-ref/docker/Dockerfile_pqc_base lines 50 and 59).
+# same dependency versions the reference implementation builds
+# (see verisign/MTL docker/Dockerfile_pqc_base lines 50 and 59).
 #
 # Build:  make build    (= docker build -f docker/Dockerfile -t ladderlens:latest .)
 # Smoke:  make smoke
@@ -58,15 +62,19 @@ RUN mkdir -p liboqs/build && cd liboqs/build && \
     cmake -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=/usr/local .. && \
     make -j"$(nproc)" && make install
 
-# --- Step 8: MTL v1.3.1 from the vendored tree (no network fetch for MTL). ---
-# Build context must contain mtl-ref/ (CI clones it at the pinned commit first).
-COPY mtl-ref/ /usr/local/app/mtl-ref/
-RUN test -d mtl-ref/src
+# --- Step 8: fetch MTL v1.3.1. ------------------------------------------------
+# Full clone (not --depth 1) so the pinned SHA can always be checked out even
+# if upstream advances past it.
+RUN git clone https://github.com/verisign/MTL.git mtl-ref
 
-# --- Step 9: generate the Autotools build system. ----------------------------
+# --- Step 9: prove we got the exact pinned commit (fail the build if not). ---
+RUN git -C mtl-ref checkout "${MTL_SHA}" && \
+    test "$(git -C mtl-ref rev-parse HEAD)" = "${MTL_SHA}"
+
+# --- Step 10: generate the Autotools build system. ---------------------------
 RUN cd mtl-ref && autoreconf --install
 
-# --- Step 10: configure + build + install libmtllib and the CLI tools. ------
+# --- Step 11: configure + build + install libmtllib and the CLI tools. ------
 # Tools land in /usr/local/bin (mtlkeygen, mtlsign, mtlverify).
 RUN cd mtl-ref && ./configure --libdir=/usr/local/lib64 && \
     make -j"$(nproc)" && make install
@@ -79,16 +87,16 @@ FROM registry.fedoraproject.org/fedora-minimal:42
 LABEL org.opencontainers.image.title="LadderLens benchmark environment"
 LABEL org.opencontainers.image.description="OpenSSL 3.6.0 + liboqs 0.16.0 + Verisign MTL v1.3.1 (mtl-ref 7cef0191)"
 
-# --- Step 11: runtime OS deps (python for analysis; nothing else). -----------
+# --- Step 12: runtime OS deps (python for analysis; nothing else). -----------
 RUN echo "/usr/local/lib64" > /etc/ld.so.conf.d/crypto.conf && \
     microdnf -y install python3 python3-pip && \
     microdnf clean all
 
-# --- Step 12: bring in everything built above (libs, headers, CLI tools). ----
+# --- Step 13: bring in everything built above (libs, headers, CLI tools). ----
 COPY --from=builder /usr/local/ /usr/local/
 COPY requirements-lock.txt /tmp/requirements-lock.txt
 
-# --- Step 13: register shared libs + install exact Python pins. --------------
+# --- Step 14: register shared libs + install exact Python pins. --------------
 RUN ldconfig && \
     python3 -m pip install --no-cache-dir -r /tmp/requirements-lock.txt && \
     rm /tmp/requirements-lock.txt
