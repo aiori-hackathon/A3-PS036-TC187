@@ -1,0 +1,6 @@
+mtl-ref/.git
+.git
+.freebuff
+results/
+**/__pycache__/
+*.pyc
