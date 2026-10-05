@@ -207,6 +207,33 @@ static void free_buf(MTLLIB_BUFFER *b)
     }
 }
 
+/* FATAL naming the exact pointer if NULL; called before every MTL call so a
+ * future failure says where it happened (added after CI run #7). */
+static void require_ptr(const char *name, const void *p)
+{
+    if (p == NULL) {
+        fprintf(stderr, "FATAL: NULL pointer: %s\n", name);
+        exit(1);
+    }
+}
+
+/* For an MTLLIB_BUFFER that must already CONTAIN bytes: in_use > 0 and a valid
+ * data pointer. Catches the empty-internal-buffer case that made
+ * mtllib_sign_append pass message_len==0 into mtl_hash_and_append
+ * (mtl-ref/src/mtl_abstract.c:129 "NULL Input Pointers", CI run #7):
+ * mtllib_buffer_initialize(data=NULL) sets buffer_position=0
+ * (mtllib_buffer.c:60-69) — bytes must be added with mtllib_buffer_append
+ * (mtllib_buffer.c), which advances position, not with a raw memcpy. */
+static void require_buf_data(const char *name, MTLLIB_BUFFER *b)
+{
+    require_ptr(name, (const void *)b);
+    if (mtllib_buffer_data_ptr(b) == NULL || mtllib_buffer_in_use(b) == 0) {
+        fprintf(stderr, "FATAL: buffer has no data: %s (in_use=%zu)\n",
+                name, mtllib_buffer_in_use(b));
+        exit(1);
+    }
+}
+
 /* ------------------------------------------------------------------ */
 /*  FS / env helpers                                                   */
 /* ------------------------------------------------------------------ */
@@ -548,7 +575,17 @@ int main(int argc, char **argv)
              *     mtllib.h:96-100). Timed per record (append only). */
             for (int i = 0; i < N; i++) {
                 msg[i] = new_buf(RECORD_SIZE, "msg");
-                memcpy(mtllib_buffer_data_ptr(msg[i]), records[i], RECORD_SIZE);  /* mtllib_buffer.h:108 */
+                /* mtllib_buffer_append (mtllib_buffer.c) memcpy's at the current
+                 * position AND advances it (buffer_position += length), so the
+                 * library reads in_use()==RECORD_SIZE bytes. A raw memcpy into
+                 * data_ptr left position==0 => message_len==0 => NULL-input guard
+                 * in mtl_hash_and_append (mtl_abstract.c:129) — CI run #7. */
+                if (mtllib_buffer_append(msg[i], records[i], RECORD_SIZE) != MTLLIB_OK) {
+                    fprintf(stderr, "FATAL: mtllib_buffer_append msg[%d] failed (trial %d)\n", i, t);
+                    return 1;
+                }
+                require_ptr("ctx", (const void *)ctx);
+                require_buf_data("msg[i] (mtl append)", msg[i]);
                 struct timespec st; ts_start(&st);
                 if (mtllib_sign_append(ctx, msg[i], &handles[i]) != MTLLIB_OK) {
                     fprintf(stderr, "FATAL: mtllib_sign_append failed rec %d trial %d\n", i, t);
@@ -576,6 +613,8 @@ int main(int argc, char **argv)
              *     (mtllib.h:249, impl mtllib.c:~790): randomizer + auth path for
              *     leaf i. Timed per record; ADDED to that record's append time. */
             for (int i = 0; i < N; i++) {
+                require_ptr("handles[i] (get_condensed_sig)", (const void *)handles[i]);
+                require_ptr("cond[i] (output buffer)", (const void *)cond[i]);
                 size_t cap = mtllib_sign_get_condensed_sig_length(ctx, handles[i]);  /* mtllib.h:239 */
                 cond[i] = new_buf(cap, "condensed");
                 struct timespec st; ts_start(&st);
@@ -603,6 +642,8 @@ int main(int argc, char **argv)
                                          bytes_cond[i]) != MTLLIB_OK) die("append cond->full");
                 if (mtllib_buffer_append(fs, mtllib_buffer_data_ptr(ladder),
                                          bytes_signed_ladder) != MTLLIB_OK) die("append ladder->full");
+                require_buf_data("msg[i] (mtl cold verify)", msg[i]);
+                require_buf_data("fs (mtl cold verify)", fs);
                 size_t condensed_len = 0;
                 struct timespec vt; ts_start(&vt);
                 MTLLIB_STATUS r = mtllib_verify(ctx, msg[i], fs, NULL, &condensed_len);
@@ -626,6 +667,7 @@ int main(int argc, char **argv)
              * against the trusted ladder (mtllib_verify ladder path, mtllib.c:935:
              * parse + auth path, NO OQS call). */
             {
+                require_buf_data("ladder (verify_signed_ladder)", ladder);
                 struct timespec vt; ts_start(&vt);
                 MTLLIB_STATUS r = mtllib_verify_signed_ladder(ctx, ladder);
                 ladder_verify_time_wrm = elapsed_ns(&vt);
@@ -636,6 +678,9 @@ int main(int argc, char **argv)
                 }
             }
             for (int i = 0; i < N; i++) {
+                require_buf_data("msg[i] (mtl warm verify)", msg[i]);
+                require_buf_data("cond[i] (mtl warm verify)", cond[i]);
+                require_buf_data("ladder (mtl warm verify)", ladder);
                 size_t condensed_len = 0;
                 struct timespec vt; ts_start(&vt);
                 MTLLIB_STATUS r = mtllib_verify(ctx, msg[i], cond[i], ladder, &condensed_len);
@@ -675,13 +720,21 @@ int main(int argc, char **argv)
             for (int i = 0; i < N; i++) {
                 MTLLIB_CTX *c = ctx_arr[i];
                 msg[i] = new_buf(RECORD_SIZE, "msg");
-                memcpy(mtllib_buffer_data_ptr(msg[i]), records[i], RECORD_SIZE);
+                /* Same position-advancing append as the MTL path — see the note
+                 * there (raw memcpy left message_len==0; CI run #7). */
+                if (mtllib_buffer_append(msg[i], records[i], RECORD_SIZE) != MTLLIB_OK) {
+                    fprintf(stderr, "FATAL: mtllib_buffer_append msg[%d] failed (trial %d)\n", i, t);
+                    return 1;
+                }
+                require_ptr("ctx_arr[i] (nonmtl append)", (const void *)c);
+                require_buf_data("msg[i] (nonmtl append)", msg[i]);
 
                 struct timespec st; ts_start(&st);
                 if (mtllib_sign_append(c, msg[i], &handles[i]) != MTLLIB_OK) {
                     fprintf(stderr, "FATAL: mtllib_sign_append failed rec %d trial %d\n", i, t);
                     return 1;
                 }
+                require_ptr("handles[i] (get_full_sig)", (const void *)handles[i]);
                 size_t cap = mtllib_sign_get_full_sig_length(c, handles[i]);   /* mtllib.h:273 */
                 fs[i] = new_buf(cap, "full_sig");
                 if (mtllib_sign_get_full_sig(c, handles[i], fs[i]) != MTLLIB_OK) {
@@ -697,6 +750,8 @@ int main(int argc, char **argv)
              * The out-param condensed_len gives the condensed portion size used for
              * the warm split below (bytes_condensed for a 1-leaf tree). */
             for (int i = 0; i < N; i++) {
+                require_buf_data("msg[i] (nonmtl cold verify)", msg[i]);
+                require_buf_data("fs[i] (nonmtl cold verify)", fs[i]);
                 size_t condensed_len = 0;
                 struct timespec vt; ts_start(&vt);
                 MTLLIB_STATUS r = mtllib_verify(ctx_arr[i], msg[i], fs[i], NULL, &condensed_len);
@@ -734,6 +789,7 @@ int main(int argc, char **argv)
                     fprintf(stderr, "FATAL: external ladder buffer init failed rec %d trial %d\n", i, t);
                     return 1;
                 }
+                require_buf_data("lad (nonmtl verify_signed_ladder)", lad);
                 struct timespec vt; ts_start(&vt);
                 MTLLIB_STATUS r = mtllib_verify_signed_ladder(ctx_arr[i], lad);
                 ladder_verify_time_wrm += elapsed_ns(&vt);
@@ -752,6 +808,9 @@ int main(int argc, char **argv)
                     fprintf(stderr, "FATAL: external condensed buffer init failed rec %d trial %d\n", i, t);
                     return 1;
                 }
+                require_buf_data("msg[i] (nonmtl warm verify)", msg[i]);
+                require_buf_data("cond_view (nonmtl warm verify)", cond_view);
+                require_buf_data("lad (nonmtl warm verify)", lad);
                 size_t out_len = 0;
                 struct timespec vt2; ts_start(&vt2);
                 r = mtllib_verify(ctx_arr[i], msg[i], cond_view, lad, &out_len);
