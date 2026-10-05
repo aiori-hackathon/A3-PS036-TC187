@@ -28,7 +28,12 @@ smoke:
 #     NEVER installed; the installed shared library is libmtlslib
 #     (src/Makefile.am:5 lib_LTLIBRARIES, same 9 source files => same public API)
 #     at /usr/local/lib64/libmtlslib.so (configure --libdir). Link -lmtlslib.
-harness: harness/bench.c
+# Real file target: rebuilds ONLY when harness/bench.c is newer than the binary.
+# (When `harness` was a phony prerequisite of harness-run, make recompiled the
+# binary on every run — 5 builds per CI job. Root-caused after CI run #10.)
+harness: harness/bench
+
+harness/bench: harness/bench.c
 	docker run --rm -v "$(CURDIR)":/work -w /work $(IMAGE) \
 		gcc -O2 -g -Wall -Wextra \
 			-I/usr/local/include/mtllib -I/usr/local/include \
@@ -38,7 +43,7 @@ harness: harness/bench.c
 
 ## harness-run: run the harness (must be built via make harness first).
 ##   make harness-run ARGS="--algorithm SLH-DSA-SHA2-128s-MTL-SHA2-128 --batch-size 10 --trials 3 --warmups 1 --seed 42 --mode mtl" OUTPUT="results/raw/mtl_n10_t3_w1.csv"
-harness-run: harness
+harness-run: harness/bench
 	@mkdir -p "$$(dirname $(OUTPUT))"
 	docker run --rm -v "$(CURDIR)":/work -w /work $(IMAGE) \
 		/work/harness/bench $(ARGS) --output "$(OUTPUT)"
