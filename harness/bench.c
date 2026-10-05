@@ -114,8 +114,14 @@
 #include <inttypes.h>
 
 #ifndef HARNESS_COMMIT
-#define HARNESS_COMMIT "unknown"
+#define HARNESS_COMMIT unknown
 #endif
+/* Two-level stringify: -DHARNESS_COMMIT=1e04598 arrives as a bare token, so it
+ * must be stringified here (CI run #6: 'd8e8f4c' undeclared). STR_(x) #x alone
+ * would stringify the literal name HARNESS_COMMIT; the extra level makes the
+ * preprocessor expand it first. */
+#define STR_(x) #x
+#define STR(x) STR_(x)
 
 #define RECORD_SIZE 64           /* bytes per record (chosen workload size, documented) */
 #define MAX_RECORDS 2048         /* safety cap on --batch-size */
@@ -373,7 +379,7 @@ static void write_metadata(const char *meta_path, const config_t *cfg,
     fprintf(f, "  \"mtl_ref_commit\": \"%s\",\n",  mtl_commit  ? mtl_commit  : "not-set");
     fprintf(f, "  \"openssl_sha\": \"%s\",\n",     openssl_pin ? openssl_pin : "not-set");
     fprintf(f, "  \"liboqs_sha\": \"%s\",\n",      liboqs_pin  ? liboqs_pin  : "not-set");
-    fprintf(f, "  \"harness_commit\": \"%s\",\n", HARNESS_COMMIT);
+    fprintf(f, "  \"harness_commit\": \"%s\",\n", STR(HARNESS_COMMIT));
     json_escape(cfg->algorithm, esc, sizeof(esc));
     fprintf(f, "  \"algorithm\": \"%s\",\n", esc);
     fprintf(f, "  \"mode\": \"%s\",\n", cfg->mode == 1 ? "mtl" : "nonmtl");
