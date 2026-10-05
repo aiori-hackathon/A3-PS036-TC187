@@ -1,9 +1,6 @@
-# LadderLens CI — builds the pinned image and runs the 1A smoke proof.
-#
-# NOTE: this machine has no Docker/WSL, so this workflow is currently the ONLY
-# way the 1A environment gets verified. It must pass before any measured claim
-# is made in later phases.
-#
+# LadderLens CI — builds the pinned image, runs the 1A smoke proof, and runs
+# the 1B harness as a CORRECTNESS check only (tiny trial counts; runner timings
+# on shared VMs are noisy and are never reported as measurements).
 # The Dockerfile fetches and SHA-verifies all three pinned components itself
 # (OpenSSL 3.6.0, liboqs 0.16.0, MTL v1.3.1), so no pre-clone step is needed
 # here and a clean `make build` works from a fresh checkout of this repo.
@@ -31,5 +28,25 @@ jobs:
 
       - name: Smoke test — sign + verify one message, print measured sizes
         run: |
+          mkdir -p results/raw
           docker run --rm -v "$PWD":/work ladderlens:latest \
             /bin/sh /work/scripts/smoke_test.sh "SLH-DSA-SHA2-128s-MTL-SHA2-128"
+
+      # ---- 1B harness (CORRECTNESS ONLY, tiny params; never reported as a measurement).
+      # Uses the same `make harness` / `make harness-run` path as local use, so CI
+      # verifies the documented workflow itself, not a parallel build recipe.
+      - name: Build + run the 1B harness (MTL & non-MTL, N in {1,10}, 3 trials, 1 warmup)
+        run: |
+          make harness
+          for mode in mtl nonmtl; do
+            for n in 1 10; do
+              out="results/raw/ci_${mode}_n${n}.csv"
+              echo "=== harness run: mode=$mode N=$n ==="
+              make harness-run ARGS="--algorithm SLH-DSA-SHA2-128s-MTL-SHA2-128 --batch-size $n --trials 3 --warmups 1 --seed 1 --mode $mode" OUTPUT="$out"
+              echo "--- $out (first 6 lines) ---"
+              head -n 6 "$out" || true
+              echo
+            done
+          done
+          echo "=== metadata example (mtl n=10) ==="
+          cat results/raw/ci_mtl_n10.csv.meta.json || true

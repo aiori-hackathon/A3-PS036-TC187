@@ -89,7 +89,37 @@ Docker and WSL are NOT installable on the dev machine. 1A is marked "written, un
 - `make install` installs mtlkeygen/mtlsign/mtlverify — examples/Makefile.am:2
 - MTL lib links liboqs + OpenSSL EVP; base deps per mtl-ref/docker/Dockerfile_pqc_base:50,59 (openssl-3.6.0, liboqs 0.16.0)
 
-#### Next: 1B (C harness) — NOT STARTED, awaiting user "continue"
+### Step 1B: C harness — WRITTEN (rewritten 2026-10-05 after type-error review); CI correctness run happens on next push; NOT yet run for real measurements
+
+**Date**: 2026-10-04; **updated 2026-10-05**
+
+#### Update 2026-10-05 (rewrite + build-path fixes, found by re-review before CI)
+- **`harness/bench.c` REWRITTEN.** The first draft had real compile-breaking type errors (garbled from interrupted turns): `&msg[i]` (a `uint8_t(*)[64]`) was passed where `MTLLIB_BUFFER **` is required, a use-after-free read of `tctx->algo_params` after `mtllib_key_free`, and wrong handle types. The rewrite is a clean implementation with every call site citing file+line.
+- **API conventions now verified against the implementations** (not just headers): all three sig getters (`mtllib_sign_get_condensed_sig` / `_signed_ladder` / `_full_sig`, mtl-ref/src/mtllib.c) APPEND into a caller-pre-initialized `MTLLIB_BUFFER` sized by the matching `*_length()` API — same pattern `mtllib_sign_get_full_sig` itself uses; `mtllib_buffer_free` (mtllib_buffer.c:85) frees the struct AND internal data but never external (caller-referenced) data, which non-MTL warm-verify uses to view ladder/condensed bytes without copying. `mtllib_verify` returns `MTLLIB_OK` (0) or `MTLLIB_OK_VALIDATED_LADDER` (1) (mtllib_status.h:43,46) — both accepted, anything else fails loudly; the harness also cross-checks the verify out-param `condensed_len` against the measured condensed size on every verify.
+- **Dockerfile fix (required for 1B):** the runtime stage had NO compiler (gcc was builder-only), so `make harness` (which compiles `harness/bench.c` inside `ladderlens:latest` at run time) would have failed with `gcc: not found`. Step 12 now installs `gcc` alongside python3. Header pins (MTL_REF_COMMIT/OPENSSL_SHA/LIBOQS_SHA) were already ENV-set in the runtime image and are what the harness metadata reports.
+- **Makefile `harness` target fixed:** bogus `.gitignore` prerequisite → `harness/bench.c`; `-O0` → `-O2`; dropped `-Werror` for the first CI pass (cannot compile locally; warnings will be reviewed from CI output and -Werror re-added after); harness git commit baked in via `-DHARNESS_COMMIT="$(git rev-parse --short HEAD)"` so every metadata JSON records the harness version.
+- **CI step now exercises the real workflow:** runs `make harness` + `make harness-run ARGS=... OUTPUT=...` (previously it inlined a divergent gcc command). Params unchanged: both modes, N in {1,10}, 3 trials, 1 warmup, seed 1, first 6 CSV lines printed, plus one metadata JSON printed. CORRECTNESS ONLY — runner timings are noisy (shared VMs) and will never be reported as measurements.
+- CSV schema unchanged (19 columns, one row per trial per record; REPEATED-vs-PER-ROW convention documented in bench.c header and the CSV comment header).
+
+#### What was done (2026-10-04, original write)
+- Wrote `harness/bench.c`: C harness linking libmtl directly (installed Verisign MTL v1.3.1 in the pinned container; -lmtllib -loqs -lcrypto). ALL MTL API calls go through the PUBLIC API in `mtl-ref/src/mtllib.h`/`mtl-ref/src/mtllib.c`, cited by file:line in the source header. CLI: `--algorithm`, `--batch-size N`, `--trials T`, `--warmups W`, `--seed S`, `--mode {nonmtl,mtl}`, `--output path.csv`. CLOCK_MONOTONIC nanosecond timing.
+- Output: one CSV (one row per trial per record; 19 columns — see header comment in bench.c for the full schema and the REPEATED-vs-PER-ROW counting convention) + one JSON metadata file (`<output>.meta.json`: CPU model, kernel, compiler, harness commit, OpenSSL/liboqs/MTL commit pins + version strings, algorithm key/sig sizes, wall time).
+- Non-MTL mode: signs each record as an independent batch-of-1 MTL operation with a FRESH keypair per record (mtllib_key_new per record) — because the MTL PUBLIC API has no reset-tree or raw-sign-with-existing-key operation (the tree in one MTLLIB_CTX only grows via mtl_hash_and_append, mtl-ref/src/mtl.c). This OVERESTIMATES true per-record signing (which reuses one zone key, no ladder). sign_time EXCLUDES keygen (keygen timed separately as keygen_time_ns); the overestimate is in keygen_time_ns (N keygens vs 1). The per-record SIGNING and VERIFY comparisons stay meaningful; the central finding (MTL amortises 1 OQS signature across N records vs N for non-MTL) holds.
+- Cold vs warm verification: cold = verify each record via the full signature (condensed || ladder) with NO pre-cached ladder (mtllib_verify, mtl-ref/src/mtllib.c:855, re-parses+re-verifies the ladder each call); warm = pre-validate the ladder once via mtllib_verify_signed_ladder (mtl-ref/src/mtllib.c:1059) then per-record mtllib_verify with separate condensed + ladder buffer (mtl-ref/src/mtllib.c:935, parse+authpath, no OQS per record). The library does NOT cache a parsed ladder on the MTLLIB_CTX across calls (always re-parses via mtl_ladder_from_buffer, mtl-ref/src/mtl_buffer.c:231), so warm per-record cost is parse+authpath (cheap) and the saving vs cold is the avoided per-record OQS ladder verify.
+- Records: 64 bytes, deterministic from seed via a NON-cryptographic LCG (no hashing of content) — stated in source + metadata.
+- Added `make harness` (builds harness/bench inside the pinned container) and `make harness-run ARGS=... OUTPUT=...` targets to the root Makefile.
+- Added a CI step (`build-and-smoke` job) that builds + runs the harness with TINY params for CORRECTNESS ONLY: MTL & non-MTL, N in {1,10}, 3 trials, 1 warmup, seed 1; prints the first 6 lines of each CSV. NOT a benchmark; tiny enough to be fast.
+
+#### NOT done (awaits your "continue")
+- Real measurements: the harness has NOT been run for real benchmarking; the tiny CI correctness run above happens on the NEXT push (this machine still has no Docker, so harness compilation itself is first verified by that CI run). No measured times exist. Step (c) below (measure ONE sign op, estimate runtime, propose trial counts) is NOT done.
+
+#### Step (c) plan (to do on your "continue"; NOT started)
+- Run the harness for ONE sign op in both modes at N=1 and N=100 (single trial, no warmups), print the per-op times, and report them here.
+- From those, estimate total runtime for N in {10,100,1000} with 30 trials + 5 warmups for BOTH modes, accounting for non-MTL's N keygens per trial (likely infeasible for non-MTL at N=1000).
+- Propose concrete trial counts per (mode, N) and ask for your approval BEFORE any large run.
+- Do NOT run the full benchmark until you approve.
+
+#### Next: your "continue" → step (c) measure-one-sign → propose trial counts → your approval → full run
 ## Phase 2: Tier 1 Extras — NOT STARTED
 ## Phase 3: Tier 2 Extras — NOT STARTED
 ## Phase 4: Presentation Layer — NOT STARTED

@@ -87,9 +87,11 @@ FROM registry.fedoraproject.org/fedora-minimal:42
 LABEL org.opencontainers.image.title="LadderLens benchmark environment"
 LABEL org.opencontainers.image.description="OpenSSL 3.6.0 + liboqs 0.16.0 + Verisign MTL v1.3.1 (mtl-ref 7cef0191)"
 
-# --- Step 12: runtime OS deps (python for analysis; nothing else). -----------
+# --- Step 12: runtime OS deps. gcc is needed to compile the 1B benchmark
+# --- harness (harness/bench.c) INSIDE this image at run time (make harness); the
+# --- MTL/OSSL/OQS libraries themselves are already built. python for analysis.
 RUN echo "/usr/local/lib64" > /etc/ld.so.conf.d/crypto.conf && \
-    microdnf -y install python3 python3-pip && \
+    microdnf -y install gcc python3 python3-pip && \
     microdnf clean all
 
 # --- Step 13: bring in everything built above (libs, headers, CLI tools). ----

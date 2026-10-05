@@ -3,7 +3,7 @@ IMAGE      := ladderlens:latest
 DOCKERFILE := docker/Dockerfile
 ALG        := SLH-DSA-SHA2-128s-MTL-SHA2-128
 
-.PHONY: build smoke shell clean
+.PHONY: build smoke harness harness-run shell clean
 
 ## build: create the pinned benchmark image (OpenSSL 3.6.0, liboqs 0.16.0, MTL v1.3.1)
 build:
@@ -12,6 +12,24 @@ build:
 ## smoke: 1A proof — sign + verify one message with $(ALG) and print measured sizes
 smoke:
 	docker run --rm -v "$(CURDIR)":/work $(IMAGE) /bin/sh /work/scripts/smoke_test.sh "$(ALG)"
+
+## harness: build the 1B C benchmark harness INSIDE the pinned container
+#   (the harness source lives on the host under harness/; gcc runs in the container
+#   which has the installed libmtl + liboqs + libcrypto and a C compiler).
+#   HARNESS_COMMIT is baked in so every CSV's metadata records which harness built it.
+harness: harness/bench.c
+	docker run --rm -v "$(CURDIR)":/work -w /work $(IMAGE) \
+		gcc -O2 -g -Wall -Wextra -I/usr/local/include \
+			-DHARNESS_COMMIT="$$(git rev-parse --short HEAD 2>/dev/null || echo unknown)" \
+			-o harness/bench harness/bench.c \
+			-L/usr/local/lib64 -lmtllib -loqs -lcrypto
+
+## harness-run: run the harness (must be built via make harness first).
+##   make harness-run ARGS="--algorithm SLH-DSA-SHA2-128s-MTL-SHA2-128 --batch-size 10 --trials 3 --warmups 1 --seed 42 --mode mtl" OUTPUT="results/raw/mtl_n10_t3_w1.csv"
+harness-run: harness
+	@mkdir -p "$$(dirname $(OUTPUT))"
+	docker run --rm -v "$(CURDIR)":/work -w /work $(IMAGE) \
+		/work/harness/bench $(ARGS) --output "$(OUTPUT)"
 
 ## shell: interactive shell in the image with the repo mounted at /work
 shell:
