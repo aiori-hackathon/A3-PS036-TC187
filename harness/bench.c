@@ -207,12 +207,19 @@ static void free_buf(MTLLIB_BUFFER *b)
     }
 }
 
+/* Trial/record context for FATAL diagnostics (single-threaded harness).
+ * g_record is -1 outside per-record loops. */
+static int         g_trial  = -1;
+static int         g_record = -1;
+static const char *g_warm   = "?";
+
 /* FATAL naming the exact pointer if NULL; called before every MTL call so a
  * future failure says where it happened (added after CI run #7). */
 static void require_ptr(const char *name, const void *p)
 {
     if (p == NULL) {
-        fprintf(stderr, "FATAL: NULL pointer: %s\n", name);
+        fprintf(stderr, "FATAL: NULL pointer: %s (trial %d, record %d, %s)\n",
+                name, g_trial, g_record, g_warm);
         exit(1);
     }
 }
@@ -228,8 +235,8 @@ static void require_buf_data(const char *name, MTLLIB_BUFFER *b)
 {
     require_ptr(name, (const void *)b);
     if (mtllib_buffer_data_ptr(b) == NULL || mtllib_buffer_in_use(b) == 0) {
-        fprintf(stderr, "FATAL: buffer has no data: %s (in_use=%zu)\n",
-                name, mtllib_buffer_in_use(b));
+        fprintf(stderr, "FATAL: buffer has no data: %s (in_use=%zu, trial %d, record %d, %s)\n",
+                name, mtllib_buffer_in_use(b), g_trial, g_record, g_warm);
         exit(1);
     }
 }
@@ -506,6 +513,9 @@ int main(int argc, char **argv)
     int total_rows = 0;
     for (int t = 1; t <= W + T; t++) {
         const int is_warmup = (t <= W);
+        g_trial  = t;                          /* FATAL diagnostics context */
+        g_warm   = is_warmup ? "warm-up" : "recorded";
+        g_record = -1;
 
         /* ---------- keygen phase (timed separately; never part of sign) ---------- */
         uint64_t keygen_time = 0;
@@ -522,7 +532,7 @@ int main(int argc, char **argv)
             ctx_arr = calloc((size_t)N, sizeof(MTLLIB_CTX *));
             if (!ctx_arr) die("calloc ctx_arr");
             struct timespec ks; ts_start(&ks);
-            for (int i = 0; i < N; i++) {
+            for (int i = 0; i < N; i++) { g_record = i; /* diagnostics context */
                 if (mtllib_key_new(alg, &ctx_arr[i]) != MTLLIB_OK || ctx_arr[i] == NULL) {
                     fprintf(stderr, "FATAL: mtllib_key_new failed (trial %d, rec %d)\n", t, i);
                     return 1;
@@ -573,7 +583,7 @@ int main(int argc, char **argv)
             /* (1) append each record — mtllib_sign_append (mtllib.h:211); the tree
              *     inside ctx grows; handle[i] identifies leaf i (MTL_HANDLE.leaf_index,
              *     mtllib.h:96-100). Timed per record (append only). */
-            for (int i = 0; i < N; i++) {
+            for (int i = 0; i < N; i++) { g_record = i; /* diagnostics context */
                 msg[i] = new_buf(RECORD_SIZE, "msg");
                 /* mtllib_buffer_append (mtllib_buffer.c) memcpy's at the current
                  * position AND advances it (buffer_position += length), so the
@@ -612,11 +622,13 @@ int main(int argc, char **argv)
             /* (3) condensed signature per record — mtllib_sign_get_condensed_sig
              *     (mtllib.h:249, impl mtllib.c:~790): randomizer + auth path for
              *     leaf i. Timed per record; ADDED to that record's append time. */
-            for (int i = 0; i < N; i++) {
+            for (int i = 0; i < N; i++) { g_record = i; /* diagnostics context */
                 require_ptr("handles[i] (get_condensed_sig)", (const void *)handles[i]);
-                require_ptr("cond[i] (output buffer)", (const void *)cond[i]);
                 size_t cap = mtllib_sign_get_condensed_sig_length(ctx, handles[i]);  /* mtllib.h:239 */
                 cond[i] = new_buf(cap, "condensed");
+                /* Guard goes AFTER new_buf: in CI run #9 the pre-init check fired
+                 * on the calloc-zeroed slot before allocation. */
+                require_ptr("cond[i] (output buffer, after new_buf)", (const void *)cond[i]);
                 struct timespec st; ts_start(&st);
                 if (mtllib_sign_get_condensed_sig(ctx, handles[i], cond[i]) != MTLLIB_OK) {
                     fprintf(stderr, "FATAL: mtllib_sign_get_condensed_sig failed rec %d trial %d\n", i, t);
@@ -636,7 +648,7 @@ int main(int argc, char **argv)
              * ladder from the sig, OQS-verifies the ladder signature, verifies the
              * auth path — the OQS ladder check is paid PER RECORD. Concatenation is
              * NOT timed. Returns MTLLIB_OK_VALIDATED_LADDER on this path. */
-            for (int i = 0; i < N; i++) {
+            for (int i = 0; i < N; i++) { g_record = i; /* diagnostics context */
                 MTLLIB_BUFFER *fs = new_buf(bytes_full[i], "full_sig_cold");
                 if (mtllib_buffer_append(fs, mtllib_buffer_data_ptr(cond[i]),  /* mtllib_buffer.h:117 */
                                          bytes_cond[i]) != MTLLIB_OK) die("append cond->full");
@@ -677,7 +689,7 @@ int main(int argc, char **argv)
                     return 1;
                 }
             }
-            for (int i = 0; i < N; i++) {
+            for (int i = 0; i < N; i++) { g_record = i; /* diagnostics context */
                 require_buf_data("msg[i] (mtl warm verify)", msg[i]);
                 require_buf_data("cond[i] (mtl warm verify)", cond[i]);
                 require_buf_data("ladder (mtl warm verify)", ladder);
@@ -697,7 +709,7 @@ int main(int argc, char **argv)
             }
 
             /* ---------- cleanup trial (mtl) ---------- */
-            for (int i = 0; i < N; i++) {
+            for (int i = 0; i < N; i++) { g_record = i; /* diagnostics context */
                 mtllib_sign_free_handle(&handles[i]);   /* mtllib.h:232 */
                 free_buf(msg[i]);
                 free_buf(cond[i]);
@@ -717,7 +729,7 @@ int main(int argc, char **argv)
              * (mtllib.h:282, impl mtllib.c) = condensed + 1-leaf signed ladder; the
              * OQS sign of the 1-leaf ladder happens INSIDE this call, so it is part
              * of sign_time_ns (documented in the header; ladder_sign_time_ns = 0). */
-            for (int i = 0; i < N; i++) {
+            for (int i = 0; i < N; i++) { g_record = i; /* diagnostics context */
                 MTLLIB_CTX *c = ctx_arr[i];
                 msg[i] = new_buf(RECORD_SIZE, "msg");
                 /* Same position-advancing append as the MTL path — see the note
@@ -749,7 +761,7 @@ int main(int argc, char **argv)
             /* ---------- COLD verify per record: full sig, no pre-verified ladder.
              * The out-param condensed_len gives the condensed portion size used for
              * the warm split below (bytes_condensed for a 1-leaf tree). */
-            for (int i = 0; i < N; i++) {
+            for (int i = 0; i < N; i++) { g_record = i; /* diagnostics context */
                 require_buf_data("msg[i] (nonmtl cold verify)", msg[i]);
                 require_buf_data("fs[i] (nonmtl cold verify)", fs[i]);
                 size_t condensed_len = 0;
@@ -781,7 +793,7 @@ int main(int argc, char **argv)
              * verify against it (parse + auth path, no OQS). The ladder bytes are an
              * EXTERNAL buffer referencing fs[i]'s data after the condensed prefix
              * (external buffers reference caller memory, mtllib_buffer.c:48). */
-            for (int i = 0; i < N; i++) {
+            for (int i = 0; i < N; i++) { g_record = i; /* diagnostics context */
                 MTLLIB_BUFFER *lad = NULL;
                 if (mtllib_buffer_initialize(&lad, (size_t)bytes_ladder_rec[i],
                                              mtllib_buffer_data_ptr(fs[i]) + cond_len[i])
@@ -829,7 +841,7 @@ int main(int argc, char **argv)
             }
 
             /* ---------- cleanup trial (nonmtl) ---------- */
-            for (int i = 0; i < N; i++) {
+            for (int i = 0; i < N; i++) { g_record = i; /* diagnostics context */
                 mtllib_sign_free_handle(&handles[i]);
                 free_buf(msg[i]);
                 free_buf(fs[i]);
@@ -842,7 +854,7 @@ int main(int argc, char **argv)
         if (!is_warmup) {
             const char *mode_s = (mode == 1) ? "mtl" : "nonmtl";
             uint64_t cond_mean = (N > 0) ? (cond_sum / (uint64_t)N) : 0;
-            for (int i = 0; i < N; i++) {
+            for (int i = 0; i < N; i++) { g_record = i; /* diagnostics context */
                 fprintf(csv,
                     "%d,%s,%d,%" PRIu64 ",%d,%s,%" PRIu64 ","
                     "%" PRIu64 ",%" PRIu64 ",%" PRIu64 ","
