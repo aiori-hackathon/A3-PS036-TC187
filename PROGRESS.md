@@ -110,6 +110,16 @@ Docker and WSL are NOT installable on the dev machine. 1A is marked "written, un
 - Added `make harness` (builds harness/bench inside the pinned container) and `make harness-run ARGS=... OUTPUT=...` targets to the root Makefile.
 - Added a CI step (`build-and-smoke` job) that builds + runs the harness with TINY params for CORRECTNESS ONLY: MTL & non-MTL, N in {1,10}, 3 trials, 1 warmup, seed 1; prints the first 6 lines of each CSV. NOT a benchmark; tiny enough to be fast.
 
+#### CI run #4 (commit 1e04598): harness build FAILED — root cause found in MTL build files, fixed (2026-10-05)
+- **Failure**: `harness/bench.c:102:10: fatal error: mtllib.h: No such file or directory` (gcc had only `-I/usr/local/include -L/usr/local/lib64 -lmtllib`).
+- **Root cause (from mtl-ref build files, not guessed)**:
+  - Headers are installed under `$(includedir)/$(PACKAGE)`: `mtl-ref/src/Makefile.am:7` declares `pkginclude_HEADERS`, and `mtl-ref/configure.ac:3` is `AC_INIT([mtllib], ...)` ⇒ PACKAGE=mtllib ⇒ headers live at **/usr/local/include/mtllib/**, not /usr/local/include/ directly.
+  - `libmtllib` is **noinst and static-only** (`mtl-ref/src/Makefile.am:1,3`: `noinst_LTLIBRARIES = libmtllib.la` + `-static`) and is NEVER installed. The installed shared library is **libmtlslib** (`mtl-ref/src/Makefile.am:5`: `lib_LTLIBRARIES = libmtlslib.la`, same 9 source files ⇒ same public API) at /usr/local/lib64/libmtlslib.so.
+  - Checked for the second trap: `mtl_error.h:41` includes the generated `mtllib_config.h` (not installed), but `mtl_error.h` is included only by `.c` files, so the installed header chain (mtllib.h → mtl.h/mtllib_buffer.h/mtllib_status.h) is self-contained.
+- **Fix (Makefile `harness` target only; bench.c untouched)**: `-I/usr/local/include/mtllib -I/usr/local/include` and `-lmtlslib` (not `-lmtllib`); comments in the target cite the build files above.
+- **Diagnostic added to CI** before the harness build: `find / \( -name mtllib.h -o -name 'libmtl*' \)` inside the image, so the next log shows ground truth even if the analysis is wrong.
+- **CI speed**: image build now uses `docker/setup-buildx-action@v4` + `docker/build-push-action@v7` (current majors, verified via API) with `cache-from/to: type=gha, mode=max` and `load: true` — re-runs after small changes should take minutes instead of ~11.
+
 #### NOT done (awaits your "continue")
 - Real measurements: the harness has NOT been run for real benchmarking; the tiny CI correctness run above happens on the NEXT push (this machine still has no Docker, so harness compilation itself is first verified by that CI run). No measured times exist. Step (c) below (measure ONE sign op, estimate runtime, propose trial counts) is NOT done.
 

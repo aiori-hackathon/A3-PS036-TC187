@@ -17,12 +17,24 @@ smoke:
 #   (the harness source lives on the host under harness/; gcc runs in the container
 #   which has the installed libmtl + liboqs + libcrypto and a C compiler).
 #   HARNESS_COMMIT is baked in so every CSV's metadata records which harness built it.
+#
+#   Paths (found via CI run #4 failure + mtl-ref build files):
+#   - Headers: src/Makefile.am:7 pkginclude_HEADERS -> $(includedir)/$(PACKAGE)
+#     with PACKAGE=mtllib (configure.ac:3 AC_INIT) => /usr/local/include/mtllib/
+#     (NOT /usr/local/include directly). Installed headers are self-contained:
+#     the only header including the generated mtllib_config.h is mtl_error.h
+#     (mtl-ref/src/mtl_error.h:41), which is included only by .c files.
+#   - Library: libmtllib is noinst + static-only (src/Makefile.am:1,3) and is
+#     NEVER installed; the installed shared library is libmtlslib
+#     (src/Makefile.am:5 lib_LTLIBRARIES, same 9 source files => same public API)
+#     at /usr/local/lib64/libmtlslib.so (configure --libdir). Link -lmtlslib.
 harness: harness/bench.c
 	docker run --rm -v "$(CURDIR)":/work -w /work $(IMAGE) \
-		gcc -O2 -g -Wall -Wextra -I/usr/local/include \
+		gcc -O2 -g -Wall -Wextra \
+			-I/usr/local/include/mtllib -I/usr/local/include \
 			-DHARNESS_COMMIT="$$(git rev-parse --short HEAD 2>/dev/null || echo unknown)" \
 			-o harness/bench harness/bench.c \
-			-L/usr/local/lib64 -lmtllib -loqs -lcrypto
+			-L/usr/local/lib64 -lmtlslib -loqs -lcrypto
 
 ## harness-run: run the harness (must be built via make harness first).
 ##   make harness-run ARGS="--algorithm SLH-DSA-SHA2-128s-MTL-SHA2-128 --batch-size 10 --trials 3 --warmups 1 --seed 42 --mode mtl" OUTPUT="results/raw/mtl_n10_t3_w1.csv"
