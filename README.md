@@ -1,2 +1,5 @@
-# AIORI-3-HACKATHON-PROJECTS
-This repository will contain the code and resources for the AIORI-3 hackathon that will be developed during the AIORI-3
+## Project Demonstration Video
+
+Watch our LadderLens project explanation video:
+
+[Watch the Video on YouTube](https://youtu.be/mqXwsXCTVTw)
