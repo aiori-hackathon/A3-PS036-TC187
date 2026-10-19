@@ -1,0 +1,8 @@
+# The reference clone is fetched by the Dockerfile itself (pinned SHA), so the
+# 1.5 MB local clone and its .git stay out of the build context entirely.
+mtl-ref
+.git
+.freebuff
+results/
+**/__pycache__/
+*.pyc
