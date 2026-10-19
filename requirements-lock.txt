@@ -1,0 +1,11 @@
+# LadderLens Python analysis stack — exact pins.
+# Target interpreter: CPython 3.13 (the python3 in the fedora-minimal:42 runtime
+# image); every pin below ships cp313 wheels.
+# Install: python3 -m pip install -r requirements-lock.txt
+# Used for: DNS wire-format sizing (dnspython), statistics and the analytical
+# cache model kept separate from measured data (numpy/scipy/pandas), charts (matplotlib).
+dnspython==2.7.0
+numpy==2.2.6
+scipy==1.15.3
+pandas==2.2.3
+matplotlib==3.10.3

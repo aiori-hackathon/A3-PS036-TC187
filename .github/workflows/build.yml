@@ -1,0 +1,68 @@
+# LadderLens CI — builds the pinned image (with GHA layer caching so re-runs
+# after small changes take minutes, not ~11), runs the 1A smoke proof, and runs
+# the 1B harness as a CORRECTNESS check only (tiny trial counts; runner timings
+# on shared VMs are noisy and are never reported as measurements).
+# The Dockerfile fetches and SHA-verifies all three pinned components itself
+# (OpenSSL 3.6.0, liboqs 0.16.0, MTL v1.3.1), so no pre-clone step is needed
+# here and a clean `make build` works from a fresh checkout of this repo.
+
+name: build-and-smoke
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    # Pinned runner: ubuntu-latest migrates to Ubuntu 26 on 19 Oct 2026.
+    # ubuntu-24.04 keeps Docker preinstalled and the toolchain stable.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+
+    steps:
+      - name: Check out LadderLens
+        uses: actions/checkout@v7 # current major (v7.0.1, verified via API 2026-10-04)
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4 # current major (v4.4.1, verified via API 2026-10-05)
+
+      - name: Build pinned image (OpenSSL 3.6.0, liboqs 0.16.0, MTL v1.3.1) with GHA layer cache
+        uses: docker/build-push-action@v7 # current major (v7.4.0, verified via API 2026-10-05)
+        with:
+          context: .
+          file: docker/Dockerfile
+          tags: ladderlens:latest
+          load: true # make ladderlens:latest available to the docker run steps below
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Smoke test — sign + verify one message, print measured sizes
+        run: |
+          mkdir -p results/raw
+          docker run --rm -v "$PWD":/work ladderlens:latest \
+            /bin/sh /work/scripts/smoke_test.sh "SLH-DSA-SHA2-128s-MTL-SHA2-128"
+
+      # ---- 1B harness (CORRECTNESS ONLY, tiny params; never reported as a measurement).
+      # Uses the same `make harness` / `make harness-run` path as local use, so CI
+      # verifies the documented workflow itself, not a parallel build recipe.
+      - name: Diagnostic — where do MTL headers/libs actually live in the image?
+        run: |
+          docker run --rm ladderlens:latest \
+            /bin/sh -c 'find / \( -name mtllib.h -o -name "libmtl*" \) 2>/dev/null || true'
+
+      - name: Build + run the 1B harness (MTL & non-MTL, N in {1,10}, 3 trials, 1 warmup)
+        run: |
+          make harness
+          for mode in mtl nonmtl; do
+            for n in 1 10; do
+              out="results/raw/ci_${mode}_n${n}.csv"
+              echo "=== harness run: mode=$mode N=$n ==="
+              make harness-run ARGS="--algorithm SLH-DSA-SHA2-128s-MTL-SHA2-128 --batch-size $n --trials 3 --warmups 1 --seed 1 --mode $mode" OUTPUT="$out"
+              echo "--- $out: header + first 5 data rows ---"
+              grep -v '^#' "$out" | head -6 || true
+              echo
+            done
+          done
+          echo "=== metadata example (mtl n=10) ==="
+          cat results/raw/ci_mtl_n10.meta.json || true

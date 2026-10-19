@@ -1,0 +1,15 @@
+# Generated benchmark output
+results/raw/
+results/summary/
+results/charts/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Local scratch
+*.log
+
+# Vendored reference implementation is a standalone clone (pinned by commit SHA; re-clone per README)
+mtl-ref/
