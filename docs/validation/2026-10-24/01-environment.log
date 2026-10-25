@@ -1,0 +1,52 @@
+$ uname -a; nproc; free -g | head -2; df -h /mnt/d | tail -1
+Linux DESKTOP-H9D5KTR 6.6.114.1-microsoft-standard-WSL2 #1 SMP PREEMPT_DYNAMIC Mon Dec  1 20:46:23 UTC 2025 x86_64 GNU/Linux
+4
+               total        used        free      shared  buff/cache   available
+Mem:               3           0           2           0           1           3
+D:\             440G   90G  350G  21% /mnt/d
+
+$ gcc --version | head -1; ~/ladderlens-deps/py313/bin/python3 -V
+gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+Python 3.13.17
+
+$ docker --version
+/mnt/d/Akshat/LadderLens_v6/LadderLens_v6/ladderlens/.build/log01.sh: line 15: docker: command not found
+
+pins (from the Dockerfile's ARGs, as exported by env.sh):
+  OPENSSL_SHA=7b371d80d959ec9ab4139d09d78e83c090de9779
+  LIBOQS_SHA=5a1a854b0dc9f2141bdc771c555ee60c37950183
+  MTL_REF_COMMIT=7cef0191da55048111d252a567b7614672424ed3
+  MTL_CFLAGS=-O2 -g -fPIC
+
+$ git -C ~/ladderlens-deps/src/openssl rev-parse HEAD
+7b371d80d959ec9ab4139d09d78e83c090de9779
+$ git -C ~/ladderlens-deps/src/liboqs rev-parse HEAD
+5a1a854b0dc9f2141bdc771c555ee60c37950183
+$ git -C ~/ladderlens-deps/src/mtl-ref rev-parse HEAD
+7cef0191da55048111d252a567b7614672424ed3
+$ git -C ~/ladderlens-deps/src/mtl-ref describe --tags --always
+MTLLIB_1_3_1-5-g7cef019
+
+$ grep -rh MTL_LIB_VERSION $PREFIX/include/mtllib
+#define MTL_LIB_VERSION "v1.3.1"
+$ grep -m1 OQS_VERSION_TEXT $PREFIX/include/oqs/oqs.h
+$ openssl version
+OpenSSL 3.6.0 1 Oct 2025 (Library: OpenSSL 3.6.0 1 Oct 2025)
+
+$ python3 -c 'importlib.metadata.version(...)' for the analysis pins
+  dnspython==2.7.0
+  numpy==2.2.6
+  scipy==1.15.3
+  pandas==2.2.3
+  matplotlib==3.10.3
+  streamlit: not installed in this environment
+
+$ ls $PREFIX/lib64/libmtlslib* $PREFIX/lib/liboqs* 2>/dev/null
+/home/admin_aksh0/ladderlens-deps/prefix/lib/liboqs.so
+/home/admin_aksh0/ladderlens-deps/prefix/lib/liboqs.so.0.16.0
+/home/admin_aksh0/ladderlens-deps/prefix/lib/liboqs.so.9
+/home/admin_aksh0/ladderlens-deps/prefix/lib64/libmtlslib.a
+/home/admin_aksh0/ladderlens-deps/prefix/lib64/libmtlslib.la
+/home/admin_aksh0/ladderlens-deps/prefix/lib64/libmtlslib.so
+/home/admin_aksh0/ladderlens-deps/prefix/lib64/libmtlslib.so.0
+/home/admin_aksh0/ladderlens-deps/prefix/lib64/libmtlslib.so.0.0.0

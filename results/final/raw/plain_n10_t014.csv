@@ -1,0 +1,15 @@
+# LadderLens bench. One row per (trial, record); empty = not applicable to this arm.
+# Per trial (repeated on each row, count once): keygen_count, keygen_ns, ladder_sign_ns,
+#   ladder_verify_ns, signed_ladder_bytes, public_key_bytes.
+# Per record: sign_ns, verify_cold_ns, verify_warm_ns, signature_bytes, condensed_bytes.
+trial,arm,batch_size,processed,record_index,record_len,seed,algorithm,keygen_count,keygen_ns,sign_ns,ladder_sign_ns,verify_cold_ns,ladder_verify_ns,verify_warm_ns,signature_bytes,condensed_bytes,signed_ladder_bytes,public_key_bytes
+14,plain,10,10,0,73,36,SLH-DSA-SHA2-128s-MTL-SHA2-128,1,117548397,899299507,,928739,,,7856,,,32
+14,plain,10,10,1,198,36,SLH-DSA-SHA2-128s-MTL-SHA2-128,1,117548397,894171967,,780493,,,7856,,,32
+14,plain,10,10,2,73,36,SLH-DSA-SHA2-128s-MTL-SHA2-128,1,117548397,904685559,,1218062,,,7856,,,32
+14,plain,10,10,3,73,36,SLH-DSA-SHA2-128s-MTL-SHA2-128,1,117548397,907163966,,2604325,,,7856,,,32
+14,plain,10,10,4,73,36,SLH-DSA-SHA2-128s-MTL-SHA2-128,1,117548397,905342444,,767043,,,7856,,,32
+14,plain,10,10,5,113,36,SLH-DSA-SHA2-128s-MTL-SHA2-128,1,117548397,916945106,,798859,,,7856,,,32
+14,plain,10,10,6,73,36,SLH-DSA-SHA2-128s-MTL-SHA2-128,1,117548397,902175853,,829485,,,7856,,,32
+14,plain,10,10,7,137,36,SLH-DSA-SHA2-128s-MTL-SHA2-128,1,117548397,972781450,,960841,,,7856,,,32
+14,plain,10,10,8,73,36,SLH-DSA-SHA2-128s-MTL-SHA2-128,1,117548397,929752242,,1343038,,,7856,,,32
+14,plain,10,10,9,137,36,SLH-DSA-SHA2-128s-MTL-SHA2-128,1,117548397,942341263,,798685,,,7856,,,32

@@ -1,7 +1,7 @@
-# LadderLens — pinned benchmark environment for hackathon problem PS-036
+# LadderLens: pinned benchmark environment for AIORI-3 PS-036.
 #
-# STATUS: WRITTEN, UNTESTED. Verification happens in GitHub Actions
-# (.github/workflows/build.yml) because the dev machine has no Docker/WSL.
+# Built and checked on every push by .github/workflows/build.yml. The same image
+# is the Codespaces dev container (.devcontainer/devcontainer.json).
 #
 # Pinned components (commit SHAs verified against upstream git tags):
 #   OpenSSL 3.6.0   commit 7b371d80d959ec9ab4139d09d78e83c090de9779  (tag openssl-3.6.0)
@@ -11,8 +11,9 @@
 #                    library version string hardcoded as v1.3.1 in that tree's src/mtl.h:41)
 #
 # All three pinned components are cloned from upstream and verified against
-# their pinned commit SHA at build time, so this image builds identically on
-# any machine. This repo does NOT vendor the MTL source; a local mtl-ref/
+# their pinned commit SHA at build time. Fedora's base tag and microdnf package
+# versions are not digest/version pinned, so the full image is not bit-for-bit
+# reproducible across time. This repo does NOT vendor the MTL source; a local mtl-ref/
 # clone (if present) is reference material only and is not used by this build.
 #
 # Base image is release-pinned fedora-minimal:42 — same base family and the
@@ -20,7 +21,7 @@
 # (see verisign/MTL docker/Dockerfile_pqc_base lines 50 and 59).
 #
 # Build:  make build    (= docker build -f docker/Dockerfile -t ladderlens:latest .)
-# Smoke:  make smoke
+# Check:  make verify
 #
 # Every build step is a separate RUN layer so a CI failure points at exactly
 # one step in the log.
@@ -32,6 +33,10 @@ ARG OPENSSL_SHA=7b371d80d959ec9ab4139d09d78e83c090de9779
 ARG LIBOQS_TAG=0.16.0
 ARG LIBOQS_SHA=5a1a854b0dc9f2141bdc771c555ee60c37950183
 ARG MTL_SHA=7cef0191da55048111d252a567b7614672424ed3
+# MTL's configure.ac replaces CFLAGS with "-g -O0" (a debug build). The library
+# is rebuilt with optimisation so its own code is measured as it would be
+# deployed; the flags are recorded in every result's metadata.
+ARG MTL_CFLAGS="-O2 -g -fPIC"
 
 # --- Step 1: C toolchain. Failure here = package/mirror problem. -------------
 RUN microdnf -y install gcc gcc-c++ make cmake git perl autoconf automake libtool && \
@@ -59,7 +64,10 @@ RUN test "$(git -C liboqs rev-parse HEAD)" = "${LIBOQS_SHA}"
 
 # --- Step 7: build + install liboqs (shared libs, into /usr/local). ----------
 RUN mkdir -p liboqs/build && cd liboqs/build && \
-    cmake -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=/usr/local .. && \
+    cmake -DBUILD_SHARED_LIBS=ON \
+        -DCMAKE_INSTALL_PREFIX=/usr/local \
+        -DCMAKE_INSTALL_LIBDIR=lib64 \
+        -DOPENSSL_ROOT_DIR=/usr/local .. && \
     make -j"$(nproc)" && make install
 
 # --- Step 8: fetch MTL v1.3.1. ------------------------------------------------
@@ -74,24 +82,26 @@ RUN git -C mtl-ref checkout "${MTL_SHA}" && \
 # --- Step 10: generate the Autotools build system. ---------------------------
 RUN cd mtl-ref && autoreconf --install
 
-# --- Step 11: configure + build + install libmtllib and the CLI tools. ------
+# --- Step 11: configure + build + install libmtlslib and the CLI tools. ----
+# CFLAGS on the make command line overrides the value configure wrote.
 # Tools land in /usr/local/bin (mtlkeygen, mtlsign, mtlverify).
 RUN cd mtl-ref && ./configure --libdir=/usr/local/lib64 && \
-    make -j"$(nproc)" && make install
+    make -j"$(nproc)" CFLAGS="${MTL_CFLAGS}" && make install
 
 # ==========================================================================
-# Runtime image: libraries + CLI tools + Python analysis stack. No compilers.
+# Runtime image: libraries, CLI tools, gcc for the harness, Python analysis.
 # ==========================================================================
 FROM registry.fedoraproject.org/fedora-minimal:42
 
 LABEL org.opencontainers.image.title="LadderLens benchmark environment"
 LABEL org.opencontainers.image.description="OpenSSL 3.6.0 + liboqs 0.16.0 + Verisign MTL v1.3.1 (mtl-ref 7cef0191)"
 
-# --- Step 12: runtime OS deps. gcc is needed to compile the 1B benchmark
-# --- harness (harness/bench.c) INSIDE this image at run time (make harness); the
-# --- MTL/OSSL/OQS libraries themselves are already built. python for analysis.
+# --- Step 12: runtime OS deps. gcc and make build the harness inside the image;
+# --- git records the repository commit; tar, gzip, which, findutils and
+# --- procps-ng let the image serve as a Codespaces dev container.
 RUN echo "/usr/local/lib64" > /etc/ld.so.conf.d/crypto.conf && \
-    microdnf -y install gcc python3 python3-pip && \
+    microdnf -y install gcc make git tar gzip which findutils procps-ng \
+        python3 python3-pip && \
     microdnf clean all
 
 # --- Step 13: bring in everything built above (libs, headers, CLI tools). ----
@@ -99,14 +109,25 @@ COPY --from=builder /usr/local/ /usr/local/
 COPY requirements-lock.txt /tmp/requirements-lock.txt
 
 # --- Step 14: register shared libs + install exact Python pins. --------------
+# Fedora's system Python carries the PEP 668 EXTERNALLY-MANAGED marker, so pip
+# refuses a system-wide install without --break-system-packages. The flag only
+# bypasses that guard; it is not needed for the pins themselves. A venv would
+# also work, but then every `python3 -m ladderlens` call in the Makefile would
+# need the venv on PATH, and a forgotten activation would silently use a
+# different interpreter than the one the manifest records.
 RUN ldconfig && \
-    python3 -m pip install --no-cache-dir -r /tmp/requirements-lock.txt && \
+    python3 -m pip install --no-cache-dir --break-system-packages -r /tmp/requirements-lock.txt && \
     rm /tmp/requirements-lock.txt
 
 # Record the exact pins inside the image so a running container can report them
 ENV MTL_REF_COMMIT=7cef0191da55048111d252a567b7614672424ed3 \
+    MTL_CFLAGS="-O2 -g -fPIC" \
     OPENSSL_SHA=7b371d80d959ec9ab4139d09d78e83c090de9779 \
-    LIBOQS_SHA=5a1a854b0dc9f2141bdc771c555ee60c37950183
+    LIBOQS_SHA=5a1a854b0dc9f2141bdc771c555ee60c37950183 \
+    LADDERLENS_IMAGE=1
+
+# Git refuses to read a repository owned by another user (bind mounts, Codespaces).
+RUN git config --system --add safe.directory '*'
 
 WORKDIR /work
 CMD ["/bin/bash"]

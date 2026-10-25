@@ -1,0 +1,20 @@
+{
+  "name": "LadderLens (pinned benchmark image)",
+  "build": {
+    "dockerfile": "../docker/Dockerfile",
+    "context": ".."
+  },
+  "hostRequirements": {
+    "cpus": 4,
+    "memory": "8gb"
+  },
+  "remoteEnv": {
+    "LADDERLENS_IMAGE": "1"
+  },
+  "postCreateCommand": "make harness",
+  "customizations": {
+    "vscode": {
+      "extensions": ["ms-python.python", "ms-vscode.cpptools"]
+    }
+  }
+}

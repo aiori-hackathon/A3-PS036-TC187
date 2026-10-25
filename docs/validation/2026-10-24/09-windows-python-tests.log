@@ -1,0 +1,71 @@
+Final command: python -m unittest discover -s tests -v
+Environment: Python 3.14.2 on Windows; temporary files directed to workspace.
+
+test_second_run_into_same_directory_is_refused (test_run_safety.EndToEndTests.test_second_run_into_same_directory_is_refused) ... ERROR
+test_accepts_new_or_empty_directory (test_run_safety.RunDirectoryTests.test_accepts_new_or_empty_directory) ... ok
+test_complete_run_loads (test_run_safety.RunDirectoryTests.test_complete_run_loads) ... ok
+test_config_digest_covers_every_benchmark_field (test_run_safety.RunDirectoryTests.test_config_digest_covers_every_benchmark_field) ... ok
+test_failed_invocations_are_not_reported_as_complete (test_run_safety.RunDirectoryTests.test_failed_invocations_are_not_reported_as_complete) ... ok
+test_refuses_non_empty_directory (test_run_safety.RunDirectoryTests.test_refuses_non_empty_directory) ... ok
+test_refuses_plan_made_with_another_configuration (test_run_safety.RunDirectoryTests.test_refuses_plan_made_with_another_configuration) ... ok
+test_rejects_directory_without_manifest (test_run_safety.RunDirectoryTests.test_rejects_directory_without_manifest) ... ok
+test_rejects_manifest_without_hashes (test_run_safety.RunDirectoryTests.test_rejects_manifest_without_hashes) ... ok
+test_rejects_missing_metadata (test_run_safety.RunDirectoryTests.test_rejects_missing_metadata) ... ok
+test_rejects_missing_recorded_file (test_run_safety.RunDirectoryTests.test_rejects_missing_recorded_file) ... ok
+test_rejects_modified_cache_summary (test_run_safety.RunDirectoryTests.test_rejects_modified_cache_summary) ... ok
+test_rejects_modified_measurements (test_run_safety.RunDirectoryTests.test_rejects_modified_measurements) ... ok
+test_rejects_modified_metadata (test_run_safety.RunDirectoryTests.test_rejects_modified_metadata) ... ok
+test_rejects_modified_schedule (test_run_safety.RunDirectoryTests.test_rejects_modified_schedule) ... ok
+test_rejects_run_without_hashed_schedule (test_run_safety.RunDirectoryTests.test_rejects_run_without_hashed_schedule) ... ok
+test_rejects_stale_file_from_earlier_run (test_run_safety.RunDirectoryTests.test_rejects_stale_file_from_earlier_run) ... ok
+test_rejects_unexpected_metadata (test_run_safety.RunDirectoryTests.test_rejects_unexpected_metadata) ... ok
+test_rejects_unfinished_run (test_run_safety.RunDirectoryTests.test_rejects_unfinished_run) ... ok
+test_report_uses_the_configuration_recorded_in_the_run (test_run_safety.RunDirectoryTests.test_report_uses_the_configuration_recorded_in_the_run) ... ok
+
+======================================================================
+ERROR: test_second_run_into_same_directory_is_refused (test_run_safety.EndToEndTests.test_second_run_into_same_directory_is_refused)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Akshat\LadderLens_v6\LadderLens_v6\main\tests\test_run_safety.py", line 239, in test_second_run_into_same_directory_is_refused
+    path, failures = run.main(cfg, plan, out)
+                     ~~~~~~~~^^^^^^^^^^^^^^^^
+  File "D:\Akshat\LadderLens_v6\LadderLens_v6\main\ladderlens\run.py", line 94, in main
+    harness.bench(c["arm"], c["n"], path, records=records, sample=c["records_per_trial"],
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  trial_base=r, seed=w["seed"], algorithm=w["algorithm"])
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Akshat\LadderLens_v6\LadderLens_v6\main\ladderlens\harness.py", line 36, in bench
+    _run(cmd)
+    ~~~~^^^^^
+  File "D:\Akshat\LadderLens_v6\LadderLens_v6\main\ladderlens\harness.py", line 63, in _run
+    proc = subprocess.run(cmd, capture_output=True, text=True)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\subprocess.py", line 554, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\subprocess.py", line 1038, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        pass_fds, cwd, env,
+                        ^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+                        gid, gids, uid, umask,
+                        ^^^^^^^^^^^^^^^^^^^^^^
+                        start_new_session, process_group)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\subprocess.py", line 1552, in _execute_child
+    hp, ht, pid, tid = _winapi.CreateProcess(executable, args,
+                       ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+                             # no special security
+                             ^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+                             cwd,
+                             ^^^^
+                             startupinfo)
+                             ^^^^^^^^^^^^
+OSError: [WinError 193] %1 is not a valid Win32 application
+
+----------------------------------------------------------------------
+Ran 20 tests in 1.368s
+
+FAILED (errors=1)
+exit=1

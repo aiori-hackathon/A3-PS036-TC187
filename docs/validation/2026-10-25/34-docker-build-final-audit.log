@@ -1,0 +1,93 @@
+docker build -f docker/Dockerfile -t ladderlens:latest .
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 6.69kB 0.2s
+#1 transferring dockerfile: 6.69kB 0.2s done
+#1 DONE 0.2s
+
+#2 [internal] load metadata for registry.fedoraproject.org/fedora-minimal:42
+#2 DONE 1.4s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 243B done
+#3 DONE 0.0s
+
+#4 [internal] load build context
+#4 DONE 0.0s
+
+#5 [builder  1/14] FROM registry.fedoraproject.org/fedora-minimal:42@sha256:09a2061e2cfb85ac8e7fa7f2234d0ace6ad4f2b7dfdf0f257c90405e4f07577d
+#5 resolve registry.fedoraproject.org/fedora-minimal:42@sha256:09a2061e2cfb85ac8e7fa7f2234d0ace6ad4f2b7dfdf0f257c90405e4f07577d 0.0s done
+#5 DONE 0.1s
+
+#4 [internal] load build context
+#4 transferring context: 43B 0.0s done
+#4 DONE 0.0s
+
+#6 [builder  9/14] RUN test "$(git -C liboqs rev-parse HEAD)" = "5a1a854b0dc9f2141bdc771c555ee60c37950183"
+#6 CACHED
+
+#7 [builder  6/14] RUN test "$(git -C openssl rev-parse HEAD)" = "7b371d80d959ec9ab4139d09d78e83c090de9779"
+#7 CACHED
+
+#8 [stage-1 5/7] RUN ldconfig &&     python3 -m pip install --no-cache-dir --break-system-packages -r /tmp/requirements-lock.txt &&     rm /tmp/requirements-lock.txt
+#8 CACHED
+
+#9 [stage-1 4/7] COPY requirements-lock.txt /tmp/requirements-lock.txt
+#9 CACHED
+
+#10 [stage-1 2/7] RUN echo "/usr/local/lib64" > /etc/ld.so.conf.d/crypto.conf &&     microdnf -y install gcc make git tar gzip which findutils procps-ng         python3 python3-pip &&     microdnf clean all
+#10 CACHED
+
+#11 [builder  3/14] RUN echo "/usr/local/lib64" > /etc/ld.so.conf.d/crypto.conf
+#11 CACHED
+
+#12 [builder  5/14] RUN git clone --depth 1 --branch "openssl-3.6.0" https://github.com/openssl/openssl.git
+#12 CACHED
+
+#13 [builder  7/14] RUN cd openssl && ./config && make -j"$(nproc)" && make install_sw
+#13 CACHED
+
+#14 [builder 14/14] RUN cd mtl-ref && ./configure --libdir=/usr/local/lib64 &&     make -j"$(nproc)" CFLAGS="-O2 -g -fPIC" && make install
+#14 CACHED
+
+#15 [builder 11/14] RUN git clone https://github.com/verisign/MTL.git mtl-ref
+#15 CACHED
+
+#16 [stage-1 6/7] RUN git config --system --add safe.directory '*'
+#16 CACHED
+
+#17 [stage-1 3/7] COPY --from=builder /usr/local/ /usr/local/
+#17 CACHED
+
+#18 [builder  2/14] RUN microdnf -y install gcc gcc-c++ make cmake git perl autoconf automake libtool &&     microdnf clean all
+#18 CACHED
+
+#19 [builder 10/14] RUN mkdir -p liboqs/build && cd liboqs/build &&     cmake -DBUILD_SHARED_LIBS=ON         -DCMAKE_INSTALL_PREFIX=/usr/local         -DCMAKE_INSTALL_LIBDIR=lib64         -DOPENSSL_ROOT_DIR=/usr/local .. &&     make -j"$(nproc)" && make install
+#19 CACHED
+
+#20 [builder  4/14] WORKDIR /usr/local/app
+#20 CACHED
+
+#21 [builder 12/14] RUN git -C mtl-ref checkout "7cef0191da55048111d252a567b7614672424ed3" &&     test "$(git -C mtl-ref rev-parse HEAD)" = "7cef0191da55048111d252a567b7614672424ed3"
+#21 CACHED
+
+#22 [builder 13/14] RUN cd mtl-ref && autoreconf --install
+#22 CACHED
+
+#23 [builder  8/14] RUN git clone --depth 1 --branch "0.16.0" https://github.com/open-quantum-safe/liboqs.git
+#23 CACHED
+
+#24 [stage-1 7/7] WORKDIR /work
+#24 CACHED
+
+#25 exporting to image
+#25 exporting layers done
+#25 exporting manifest sha256:a3b11385d5e5d49732da9985916e53dbb57d1bdc212502296f4ee8175f1780f8 done
+#25 exporting config sha256:6a77d333da190e2ecf5505456368de696ab3ef9a99f4f68ca45dbb7d5fad580f done
+#25 exporting attestation manifest sha256:083af172a368b1dd29af4f1fc60a98a846068f6c51045c184638d26bbe647305
+#25 exporting attestation manifest sha256:083af172a368b1dd29af4f1fc60a98a846068f6c51045c184638d26bbe647305 0.0s done
+#25 exporting manifest list sha256:0aac2285284a317e36e8f6a45ddfcea00e31be93ca059705384df59069dbc766 0.0s done
+#25 naming to docker.io/library/ladderlens:latest done
+#25 unpacking to docker.io/library/ladderlens:latest 0.0s done
+#25 DONE 0.2s

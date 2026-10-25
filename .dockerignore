@@ -1,8 +1,13 @@
-# The reference clone is fetched by the Dockerfile itself (pinned SHA), so the
-# 1.5 MB local clone and its .git stay out of the build context entirely.
-mtl-ref
+# The image fetches and SHA-checks its own MTL source; nothing here is needed to build it.
 .git
+.github
+.devcontainer
 .freebuff
-results/
-**/__pycache__/
+mtl-ref
+harness/bin
+fixtures
+results
+dashboard
+docs
+**/__pycache__
 *.pyc

@@ -1,0 +1,4 @@
+# Optional dashboard (not part of the pinned benchmark image).
+# Install on top of requirements-lock.txt:  pip install -r requirements-dashboard.txt
+-r requirements-lock.txt
+streamlit==1.65.0

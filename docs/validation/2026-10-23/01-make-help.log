@@ -1,0 +1,10 @@
+$ make help
+make build       build the pinned image (OpenSSL 3.6.0, liboqs 0.16.0, MTL v1.3.1)
+make verify      crypto self-test, correctness and exact-size checks (about two minutes)
+make test        unit tests (run-directory safety, report integrity)
+make demo        short narrated end-to-end run
+make plan        time a pilot and plan trials within the budget in configs/benchmark.toml
+make bench       run the plan; RUN=results/final to write the final results
+make report      tables, charts and report.md for RUN (default: latest run)
+make readme      write the summary of results/final into README.md
+make dashboard   interactive view of a run (needs requirements-dashboard.txt)

@@ -1,0 +1,41 @@
+LadderLens Docker/build validation — 24 October 2026
+
+Requested checks
+----------------
+make build    NOT RUN: GNU Make and Docker are not installed/on PATH.
+make harness  NOT RUN: GNU Make and Docker are not installed/on PATH.
+make smoke    NOT RUN: GNU Make and Docker are not installed/on PATH.
+make verify   NOT RUN: GNU Make and Docker are not installed/on PATH.
+make test     NOT RUN: GNU Make and Docker are not installed/on PATH.
+
+Environment checks
+------------------
+PowerShell Get-Command docker,make: neither command found.
+docker --version: command not found.
+make --version: command not found.
+wsl.exe --status: failed with Wsl/E_ACCESSDENIED.
+
+Static review / change made
+---------------------------
+Inspected docker/Dockerfile, requirements-lock.txt, .dockerignore, Makefile,
+and .github/workflows/build.yml. The liboqs CMake configure previously relied
+on the platform default library directory and OpenSSL discovery. The Dockerfile
+now explicitly installs liboqs into /usr/local/lib64 and sets
+OPENSSL_ROOT_DIR=/usr/local, matching the later MTL link/runtime paths and the
+OpenSSL built in the image. This is a source-level correction, not proof that
+the image builds.
+
+Local checks (not Docker verification)
+--------------------------------------
+python -m compileall -q ladderlens tests dashboard: PASS.
+python -m unittest discover -s tests -v with TEMP/TMP directed to .build/test-tmp:
+19 passed; 1 skipped. The end-to-end C harness test is skipped on Windows because
+the available harness binary is Linux ELF and cannot run as a Windows executable.
+The same test remains enabled in Linux/Docker.
+
+Conclusion
+----------
+The actual Docker image build and its harness/smoke/verify/test targets remain
+unverified on this host. Run the five requested commands from the repository's
+main directory on a Docker- and GNU Make-enabled Linux host, retaining their
+full console output. Do not describe the current local checks as an image build.

@@ -1,0 +1,5 @@
+$ make report RUN=results/runs/20261023-replica-full    # the interrupted run
+python3 -m ladderlens --config configs/benchmark.toml report results/runs/20261023-replica-full
+error: results/runs/20261023-replica-full is not a complete run (status: running). Runs are not resumed; start a new run in a new directory.
+make: *** [Makefile:68: report] Error 1
+exit status: 2

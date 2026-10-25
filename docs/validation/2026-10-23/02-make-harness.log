@@ -1,0 +1,8 @@
+$ make harness
+gcc -O2 -g -Wall -Wextra -I/usr/local/include/mtllib -I/usr/local/include -DHARNESS_COMMIT=fa3a067 "-DHARNESS_CFLAGS=-O2 -g -Wall -Wextra" \
+	-o harness/bin/bench harness/bench.c -L/usr/local/lib64 -lmtlslib -loqs -lcrypto -lm
+gcc -O2 -g -Wall -Wextra -I/usr/local/include/mtllib -I/usr/local/include -DHARNESS_COMMIT=fa3a067 "-DHARNESS_CFLAGS=-O2 -g -Wall -Wextra" \
+	-o harness/bin/cachesim harness/cachesim.c -L/usr/local/lib64 -lmtlslib -loqs -lcrypto -lm
+gcc -O2 -g -Wall -Wextra -I/usr/local/include/mtllib -I/usr/local/include -DHARNESS_COMMIT=fa3a067 "-DHARNESS_CFLAGS=-O2 -g -Wall -Wextra" \
+	-o harness/bin/selftest harness/selftest.c -L/usr/local/lib64 -lmtlslib -loqs -lcrypto -lm
+exit status: 0

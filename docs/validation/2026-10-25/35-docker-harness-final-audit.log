@@ -1,0 +1,6 @@
+docker run --rm -v "D:/Akshat/LadderLens_v6/LadderLens_v6/main":/work -w /work ladderlens:latest gcc -O2 -g -Wall -Wextra -I/usr/local/include/mtllib -I/usr/local/include -DHARNESS_COMMIT=unknown "-DHARNESS_CFLAGS=-O2 -g -Wall -Wextra" \
+	-o harness/bin/bench harness/bench.c -L/usr/local/lib64 -lmtlslib -loqs -lcrypto -lm
+docker run --rm -v "D:/Akshat/LadderLens_v6/LadderLens_v6/main":/work -w /work ladderlens:latest gcc -O2 -g -Wall -Wextra -I/usr/local/include/mtllib -I/usr/local/include -DHARNESS_COMMIT=unknown "-DHARNESS_CFLAGS=-O2 -g -Wall -Wextra" \
+	-o harness/bin/cachesim harness/cachesim.c -L/usr/local/lib64 -lmtlslib -loqs -lcrypto -lm
+docker run --rm -v "D:/Akshat/LadderLens_v6/LadderLens_v6/main":/work -w /work ladderlens:latest gcc -O2 -g -Wall -Wextra -I/usr/local/include/mtllib -I/usr/local/include -DHARNESS_COMMIT=unknown "-DHARNESS_CFLAGS=-O2 -g -Wall -Wextra" \
+	-o harness/bin/selftest harness/selftest.c -L/usr/local/lib64 -lmtlslib -loqs -lcrypto -lm

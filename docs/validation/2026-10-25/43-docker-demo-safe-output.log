@@ -1,0 +1,17 @@
+docker run --rm -v "D:/Akshat/LadderLens_v6/LadderLens_v6/main":/work -w /work ladderlens:latest /bin/sh scripts/demo.sh
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/work/ladderlens/__main__.py", line 77, in <module>
+    sys.exit(main())
+             ~~~~^^
+  File "/work/ladderlens/__main__.py", line 13, in main
+    return _main(argv)
+  File "/work/ladderlens/__main__.py", line 60, in _main
+    return demo.main(cfg)
+           ~~~~~~~~~^^^^^
+  File "/work/ladderlens/demo.py", line 20, in main
+    out = Path(tempfile.mkdtemp(prefix="demo-", dir=config.RESULTS))
+          ^^^^
+NameError: name 'Path' is not defined
+make: *** [Makefile:74: demo] Error 1

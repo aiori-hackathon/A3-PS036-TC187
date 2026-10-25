@@ -1,0 +1,22 @@
+LadderLens organizer-outline PDF validation - 24 October 2026
+
+Artifact: docs/LadderLens-PS036-structured-provisional.pdf
+Source outline: public AIORI-3 Hackathon Guidelines link to Proposed-structure-hackathon.pdf.
+
+Structural checks
+-----------------
+Pages: 11 (PASS)
+Required sections: cover, abstract/problem description, background, literature and RFC review, proposed solution, solution optimization, architecture design, data flow diagram, deployment timeline, bibliography, thank-you (PASS)
+Provisional status and Docker-not-verified disclosure: present (PASS)
+Team code and team member placeholders: present (PASS)
+Result values cross-checked against retained report: 216/216 trials, 15/15 cache replays, 944.85 s extrapolated, 929.3 ms measured (PASS)
+No claim that Docker passed (PASS)
+
+Visual check
+------------
+All 11 pages rendered with Poppler and visually inspected in a contact sheet. Page 6 was re-rendered at 120 dpi after adding the RRset-sampling uncertainty disclosure; table, note and chart are now separated with no clipping or overlap. Other pages retain consistent typography, margins, page numbers, section headers, charts, tables and disclosure footer. (PASS)
+Poppler emitted a Symbol display-font warning while rendering an embedded chart; all chart marks/text rendered legibly in visual inspection. The initial page-6 overlap was caught and corrected before finalizing.
+
+Limitations
+-----------
+This checks outline alignment and presentation integrity only. The official PS-036 statement, team identifiers and mentor answers were not present; exact requirement compliance remains unverified.

@@ -1,0 +1,11 @@
+Release archive extraction validation - 24 October 2026
+
+Archive tested: LadderLens_v6-release-2026-10-24-final4.zip
+Extracted to a new workspace-local scratch directory.
+
+Portable tests: 19 passed; 1 skipped because the source archive intentionally excludes harness binaries and make harness was unavailable on this Windows host. No test failed.
+Python compileall: passed for ladderlens, tests and dashboard.
+Retained-run validator: passed on results/final.
+Retained result hashes: all 463 manifest-listed files matched.
+
+The tests validate the portable Python subset and retained data integrity. They do not build or execute Docker or the Linux C harness.

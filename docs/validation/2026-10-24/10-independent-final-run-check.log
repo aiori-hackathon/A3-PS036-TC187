@@ -1,0 +1,24 @@
+Command: Python standard library/pandas validator, SHA-256 recomputation and raw CSV median recalculation.
+
+Traceback (most recent call last):
+status: complete
+trials: {'planned': 216, 'attempted': 216, 'completed': 216, 'failed': 0} cache: {'planned': 15, 'completed': 15} wall_seconds: 9812.4
+host_in_pinned_image: False LADDERLENS_IMAGE: None
+manifest_hashes: 463 actual_listed_files: 463 missing: 0 unexpected: 0
+raw_rows: 42120 trial_cells: 216 schedule_rows: 216 schedule_status: {'ok': 216}
+plain N=1000 median_sign_s_raw: 944.852 trials: 21
+mtl N=1000 median_sign_s_raw: 0.929 trials: 30
+  File "<stdin>", line 27, in <module>
+ModuleNotFoundError: No module named 'pdfplumber'
+
+PDF verification using bundled workspace Python (the default Python lacked pdfplumber):
+pypdf pages: 8 encrypted: False bytes: 16365
+pdfplumber pages: 8 page_text_lengths: [602, 774, 541, 633, 836, 589, 682, 1056]
+'1,017x' True
+'944.85 s' True
+'0.929 s' True
+'850.2 us' True
+'8,552 B' True
+'99.98%' True
+'163.5 min' True
+'provisional' True

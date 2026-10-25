@@ -1,0 +1,15 @@
+$ make plan
+python3 -m ladderlens --config configs/benchmark.toml plan
+pilot: SLH-DSA sign 0.545 s, verify 0.55 ms, MTL append 2.0 us, warm verify 2.0 us
+arm         N  records  trials    est. s
+plain      10       10      28       173
+plain     100      100      28      1548
+plain    1000      100      28      1548  (extrapolated)
+mtl1       10       10      28       190
+mtl1      100      100      28      1738
+mtl1     1000      100      28      1738  (extrapolated)
+mtl        10       10      30        38
+mtl       100      100      30        40
+mtl      1000     1000      30        55
+cache runs ~27 s; total ~118 min (within the 120 min budget). Plan written to results/plan.json
+exit status: 0

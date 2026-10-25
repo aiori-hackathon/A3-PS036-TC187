@@ -1,0 +1,15 @@
+$ make smoke
+/bin/sh scripts/smoke_test.sh
+algorithm: SLH-DSA-SHA2-128s-MTL-SHA2-128
+pins: MTL 7cef0191da55048111d252a567b7614672424ed3, OpenSSL 7b371d80d959ec9ab4139d09d78e83c090de9779, liboqs 5a1a854b0dc9f2141bdc771c555ee60c37950183
+verify condensed signature with ladder:
+Signature ACCEPTED
+verify full signature:
+Signature ACCEPTED
+sizes (bytes):
+      32  smoke_key.pub
+    8004  msg1.bin.full_sig
+      76  msg1.bin.condensed_sig
+    7928  smoke_key.key.ladder
+smoke test passed
+exit status: 0

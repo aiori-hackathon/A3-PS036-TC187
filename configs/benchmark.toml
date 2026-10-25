@@ -1,0 +1,33 @@
+# LadderLens benchmark configuration (PS-036).
+# Every value here is copied into the run manifest.
+
+[workload]
+algorithm = "SLH-DSA-SHA2-128s-MTL-SHA2-128"
+sizes = [10, 100, 1000]          # the three dataset sizes; confirm with the mentor
+seed = 36
+origin = "bench.example."
+
+[arms]
+enabled = ["plain", "mtl1", "mtl"]
+
+[trials]
+max = 30                         # trials per cell when the budget allows
+min = 5                          # never plan fewer than this
+
+[budget]
+minutes = 120                    # wall-clock target for `make bench`
+max_records_per_trial = 100      # plain and mtl1 sample above this; totals are then extrapolated
+min_records_per_trial = 20
+
+[cache]
+initial = 1000                   # records signed before the first query
+queries = 20000
+zipf = 1.0                       # assumed popularity skew (workload choice)
+ttls = [100, 1000, 5000, 0]      # ladder cache lifetime in queries; 0 = no expiry
+growth_every = 2000              # append-only growth run: queries between growth events
+growth_size = 50                 # records appended per growth event
+seeds = [1, 2, 3]
+
+[dns]
+limits = [512, 1232, 1400, 1472] # UDP payload limits compared against
+edns_payload = 1232

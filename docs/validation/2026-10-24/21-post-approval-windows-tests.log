@@ -1,0 +1,432 @@
+test_second_run_into_same_directory_is_refused (test_run_safety.EndToEndTests.test_second_run_into_same_directory_is_refused) ... skipped 'the harness binaries are Linux executables; run this test in Docker'
+test_accepts_new_or_empty_directory (test_run_safety.RunDirectoryTests.test_accepts_new_or_empty_directory) ... ERROR
+test_complete_run_loads (test_run_safety.RunDirectoryTests.test_complete_run_loads) ... ERROR
+test_config_digest_covers_every_benchmark_field (test_run_safety.RunDirectoryTests.test_config_digest_covers_every_benchmark_field) ... ok
+test_failed_invocations_are_not_reported_as_complete (test_run_safety.RunDirectoryTests.test_failed_invocations_are_not_reported_as_complete) ... ERROR
+test_refuses_non_empty_directory (test_run_safety.RunDirectoryTests.test_refuses_non_empty_directory) ... ERROR
+test_refuses_plan_made_with_another_configuration (test_run_safety.RunDirectoryTests.test_refuses_plan_made_with_another_configuration) ... ERROR
+test_rejects_directory_without_manifest (test_run_safety.RunDirectoryTests.test_rejects_directory_without_manifest) ... ERROR
+test_rejects_manifest_without_hashes (test_run_safety.RunDirectoryTests.test_rejects_manifest_without_hashes) ... ERROR
+test_rejects_missing_metadata (test_run_safety.RunDirectoryTests.test_rejects_missing_metadata) ... ERROR
+test_rejects_missing_recorded_file (test_run_safety.RunDirectoryTests.test_rejects_missing_recorded_file) ... ERROR
+test_rejects_modified_cache_summary (test_run_safety.RunDirectoryTests.test_rejects_modified_cache_summary) ... ERROR
+test_rejects_modified_measurements (test_run_safety.RunDirectoryTests.test_rejects_modified_measurements) ... ERROR
+test_rejects_modified_metadata (test_run_safety.RunDirectoryTests.test_rejects_modified_metadata) ... ERROR
+test_rejects_modified_schedule (test_run_safety.RunDirectoryTests.test_rejects_modified_schedule) ... ERROR
+test_rejects_run_without_hashed_schedule (test_run_safety.RunDirectoryTests.test_rejects_run_without_hashed_schedule) ... ERROR
+test_rejects_stale_file_from_earlier_run (test_run_safety.RunDirectoryTests.test_rejects_stale_file_from_earlier_run) ... ERROR
+test_rejects_unexpected_metadata (test_run_safety.RunDirectoryTests.test_rejects_unexpected_metadata) ... ERROR
+test_rejects_unfinished_run (test_run_safety.RunDirectoryTests.test_rejects_unfinished_run) ... ERROR
+test_report_uses_the_configuration_recorded_in_the_run (test_run_safety.RunDirectoryTests.test_report_uses_the_configuration_recorded_in_the_run) ... ok
+
+======================================================================
+ERROR: test_accepts_new_or_empty_directory (test_run_safety.RunDirectoryTests.test_accepts_new_or_empty_directory)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1011, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+FileNotFoundError: [WinError 3] The system cannot find the path specified: 'C:\\Users\\Admin\\AppData\\Local\\Packages\\sandbox.{c8b1de1b-d7cb-4cab-82ed-8de9de66b092}\\AC\\Temp\\tmp4nebnmt4\\new\\raw'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Akshat\LadderLens_v6\LadderLens_v6\main\tests\test_run_safety.py", line 101, in test_accepts_new_or_empty_directory
+    run._prepare(self.tmp / "new")
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "D:\Akshat\LadderLens_v6\LadderLens_v6\main\ladderlens\run.py", line 33, in _prepare
+    (out / "raw").mkdir(parents=True, exist_ok=True)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1015, in mkdir
+    self.parent.mkdir(parents=True, exist_ok=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1011, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+PermissionError: [WinError 5] Access is denied: 'C:\\Users\\Admin\\AppData\\Local\\Packages\\sandbox.{c8b1de1b-d7cb-4cab-82ed-8de9de66b092}\\AC\\Temp\\tmp4nebnmt4\\new'
+
+======================================================================
+ERROR: test_complete_run_loads (test_run_safety.RunDirectoryTests.test_complete_run_loads)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1011, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+FileNotFoundError: [WinError 3] The system cannot find the path specified: 'C:\\Users\\Admin\\AppData\\Local\\Packages\\sandbox.{c8b1de1b-d7cb-4cab-82ed-8de9de66b092}\\AC\\Temp\\tmp4z3jty6z\\ok\\raw'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Akshat\LadderLens_v6\LadderLens_v6\main\tests\test_run_safety.py", line 108, in test_complete_run_loads
+    df, metas, man = analysis.load_run(fake_run(self.tmp / "ok"))
+                                       ~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "D:\Akshat\LadderLens_v6\LadderLens_v6\main\tests\test_run_safety.py", line 33, in fake_run
+    (root / "raw").mkdir(parents=True)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1015, in mkdir
+    self.parent.mkdir(parents=True, exist_ok=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1011, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+PermissionError: [WinError 5] Access is denied: 'C:\\Users\\Admin\\AppData\\Local\\Packages\\sandbox.{c8b1de1b-d7cb-4cab-82ed-8de9de66b092}\\AC\\Temp\\tmp4z3jty6z\\ok'
+
+======================================================================
+ERROR: test_failed_invocations_are_not_reported_as_complete (test_run_safety.RunDirectoryTests.test_failed_invocations_are_not_reported_as_complete)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1011, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+FileNotFoundError: [WinError 3] The system cannot find the path specified: 'C:\\Users\\Admin\\AppData\\Local\\Packages\\sandbox.{c8b1de1b-d7cb-4cab-82ed-8de9de66b092}\\AC\\Temp\\tmpha6di4or\\partialok\\raw'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Akshat\LadderLens_v6\LadderLens_v6\main\tests\test_run_safety.py", line 191, in test_failed_invocations_are_not_reported_as_complete
+    r = fake_run(self.tmp / "partialok", status="complete_with_failures")
+  File "D:\Akshat\LadderLens_v6\LadderLens_v6\main\tests\test_run_safety.py", line 33, in fake_run
+    (root / "raw").mkdir(parents=True)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1015, in mkdir
+    self.parent.mkdir(parents=True, exist_ok=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1011, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+PermissionError: [WinError 5] Access is denied: 'C:\\Users\\Admin\\AppData\\Local\\Packages\\sandbox.{c8b1de1b-d7cb-4cab-82ed-8de9de66b092}\\AC\\Temp\\tmpha6di4or\\partialok'
+
+======================================================================
+ERROR: test_refuses_non_empty_directory (test_run_safety.RunDirectoryTests.test_refuses_non_empty_directory)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Akshat\LadderLens_v6\LadderLens_v6\main\tests\test_run_safety.py", line 69, in test_refuses_non_empty_directory
+    out.mkdir()
+    ~~~~~~~~~^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1011, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+PermissionError: [WinError 5] Access is denied: 'C:\\Users\\Admin\\AppData\\Local\\Packages\\sandbox.{c8b1de1b-d7cb-4cab-82ed-8de9de66b092}\\AC\\Temp\\tmpc2gh6w80\\final'
+
+======================================================================
+ERROR: test_refuses_plan_made_with_another_configuration (test_run_safety.RunDirectoryTests.test_refuses_plan_made_with_another_configuration)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Akshat\LadderLens_v6\LadderLens_v6\main\tests\test_run_safety.py", line 84, in test_refuses_plan_made_with_another_configuration
+    plan.write_text(json.dumps({"config_sha256": "0" * 64, "cells": [
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        {"arm": "mtl", "n": 1, "records_per_trial": 1, "trials": 1}]}))
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 809, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 771, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: 'C:\\Users\\Admin\\AppData\\Local\\Packages\\sandbox.{c8b1de1b-d7cb-4cab-82ed-8de9de66b092}\\AC\\Temp\\tmpdo5ssen0\\plan.json'
+
+======================================================================
+ERROR: test_rejects_directory_without_manifest (test_run_safety.RunDirectoryTests.test_rejects_directory_without_manifest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1011, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+FileNotFoundError: [WinError 3] The system cannot find the path specified: 'C:\\Users\\Admin\\AppData\\Local\\Packages\\sandbox.{c8b1de1b-d7cb-4cab-82ed-8de9de66b092}\\AC\\Temp\\tmpmnyg1obu\\loose\\raw'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Akshat\LadderLens_v6\LadderLens_v6\main\tests\test_run_safety.py", line 214, in test_rejects_directory_without_manifest
+    (self.tmp / "loose" / "raw").mkdir(parents=True)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1015, in mkdir
+    self.parent.mkdir(parents=True, exist_ok=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1011, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+PermissionError: [WinError 5] Access is denied: 'C:\\Users\\Admin\\AppData\\Local\\Packages\\sandbox.{c8b1de1b-d7cb-4cab-82ed-8de9de66b092}\\AC\\Temp\\tmpmnyg1obu\\loose'
+
+======================================================================
+ERROR: test_rejects_manifest_without_hashes (test_run_safety.RunDirectoryTests.test_rejects_manifest_without_hashes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1011, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+FileNotFoundError: [WinError 3] The system cannot find the path specified: 'C:\\Users\\Admin\\AppData\\Local\\Packages\\sandbox.{c8b1de1b-d7cb-4cab-82ed-8de9de66b092}\\AC\\Temp\\tmpp1vpe5w8\\nohashes\\raw'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Akshat\LadderLens_v6\LadderLens_v6\main\tests\test_run_safety.py", line 167, in test_rejects_manifest_without_hashes
+    r = fake_run(self.tmp / "nohashes")
+  File "D:\Akshat\LadderLens_v6\LadderLens_v6\main\tests\test_run_safety.py", line 33, in fake_run
+    (root / "raw").mkdir(parents=True)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1015, in mkdir
+    self.parent.mkdir(parents=True, exist_ok=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1011, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+PermissionError: [WinError 5] Access is denied: 'C:\\Users\\Admin\\AppData\\Local\\Packages\\sandbox.{c8b1de1b-d7cb-4cab-82ed-8de9de66b092}\\AC\\Temp\\tmpp1vpe5w8\\nohashes'
+
+======================================================================
+ERROR: test_rejects_missing_metadata (test_run_safety.RunDirectoryTests.test_rejects_missing_metadata)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1011, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+FileNotFoundError: [WinError 3] The system cannot find the path specified: 'C:\\Users\\Admin\\AppData\\Local\\Packages\\sandbox.{c8b1de1b-d7cb-4cab-82ed-8de9de66b092}\\AC\\Temp\\tmp7emolr6r\\nometa\\raw'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Akshat\LadderLens_v6\LadderLens_v6\main\tests\test_run_safety.py", line 132, in test_rejects_missing_metadata
+    r = fake_run(self.tmp / "nometa")
+  File "D:\Akshat\LadderLens_v6\LadderLens_v6\main\tests\test_run_safety.py", line 33, in fake_run
+    (root / "raw").mkdir(parents=True)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1015, in mkdir
+    self.parent.mkdir(parents=True, exist_ok=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1011, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+PermissionError: [WinError 5] Access is denied: 'C:\\Users\\Admin\\AppData\\Local\\Packages\\sandbox.{c8b1de1b-d7cb-4cab-82ed-8de9de66b092}\\AC\\Temp\\tmp7emolr6r\\nometa'
+
+======================================================================
+ERROR: test_rejects_missing_recorded_file (test_run_safety.RunDirectoryTests.test_rejects_missing_recorded_file)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1011, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+FileNotFoundError: [WinError 3] The system cannot find the path specified: 'C:\\Users\\Admin\\AppData\\Local\\Packages\\sandbox.{c8b1de1b-d7cb-4cab-82ed-8de9de66b092}\\AC\\Temp\\tmp1fkd3o9c\\missing\\raw'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Akshat\LadderLens_v6\LadderLens_v6\main\tests\test_run_safety.py", line 120, in test_rejects_missing_recorded_file
+    r = fake_run(self.tmp / "missing", listed=["mtl_n1_t001.csv", "mtl_n1_t002.csv"])
+  File "D:\Akshat\LadderLens_v6\LadderLens_v6\main\tests\test_run_safety.py", line 33, in fake_run
+    (root / "raw").mkdir(parents=True)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1015, in mkdir
+    self.parent.mkdir(parents=True, exist_ok=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1011, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+PermissionError: [WinError 5] Access is denied: 'C:\\Users\\Admin\\AppData\\Local\\Packages\\sandbox.{c8b1de1b-d7cb-4cab-82ed-8de9de66b092}\\AC\\Temp\\tmp1fkd3o9c\\missing'
+
+======================================================================
+ERROR: test_rejects_modified_cache_summary (test_run_safety.RunDirectoryTests.test_rejects_modified_cache_summary)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1011, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+FileNotFoundError: [WinError 3] The system cannot find the path specified: 'C:\\Users\\Admin\\AppData\\Local\\Packages\\sandbox.{c8b1de1b-d7cb-4cab-82ed-8de9de66b092}\\AC\\Temp\\tmpgkmqhcqb\\editedcache\\raw'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Akshat\LadderLens_v6\LadderLens_v6\main\tests\test_run_safety.py", line 160, in test_rejects_modified_cache_summary
+    r = fake_run(self.tmp / "editedcache")
+  File "D:\Akshat\LadderLens_v6\LadderLens_v6\main\tests\test_run_safety.py", line 33, in fake_run
+    (root / "raw").mkdir(parents=True)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1015, in mkdir
+    self.parent.mkdir(parents=True, exist_ok=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1011, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+PermissionError: [WinError 5] Access is denied: 'C:\\Users\\Admin\\AppData\\Local\\Packages\\sandbox.{c8b1de1b-d7cb-4cab-82ed-8de9de66b092}\\AC\\Temp\\tmpgkmqhcqb\\editedcache'
+
+======================================================================
+ERROR: test_rejects_modified_measurements (test_run_safety.RunDirectoryTests.test_rejects_modified_measurements)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1011, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+FileNotFoundError: [WinError 3] The system cannot find the path specified: 'C:\\Users\\Admin\\AppData\\Local\\Packages\\sandbox.{c8b1de1b-d7cb-4cab-82ed-8de9de66b092}\\AC\\Temp\\tmpw1za9k67\\editedcsv\\raw'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Akshat\LadderLens_v6\LadderLens_v6\main\tests\test_run_safety.py", line 153, in test_rejects_modified_measurements
+    r = fake_run(self.tmp / "editedcsv")
+  File "D:\Akshat\LadderLens_v6\LadderLens_v6\main\tests\test_run_safety.py", line 33, in fake_run
+    (root / "raw").mkdir(parents=True)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1015, in mkdir
+    self.parent.mkdir(parents=True, exist_ok=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1011, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+PermissionError: [WinError 5] Access is denied: 'C:\\Users\\Admin\\AppData\\Local\\Packages\\sandbox.{c8b1de1b-d7cb-4cab-82ed-8de9de66b092}\\AC\\Temp\\tmpw1za9k67\\editedcsv'
+
+======================================================================
+ERROR: test_rejects_modified_metadata (test_run_safety.RunDirectoryTests.test_rejects_modified_metadata)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1011, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+FileNotFoundError: [WinError 3] The system cannot find the path specified: 'C:\\Users\\Admin\\AppData\\Local\\Packages\\sandbox.{c8b1de1b-d7cb-4cab-82ed-8de9de66b092}\\AC\\Temp\\tmp2n0a7_jt\\editedmeta\\raw'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Akshat\LadderLens_v6\LadderLens_v6\main\tests\test_run_safety.py", line 146, in test_rejects_modified_metadata
+    r = fake_run(self.tmp / "editedmeta")
+  File "D:\Akshat\LadderLens_v6\LadderLens_v6\main\tests\test_run_safety.py", line 33, in fake_run
+    (root / "raw").mkdir(parents=True)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1015, in mkdir
+    self.parent.mkdir(parents=True, exist_ok=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1011, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+PermissionError: [WinError 5] Access is denied: 'C:\\Users\\Admin\\AppData\\Local\\Packages\\sandbox.{c8b1de1b-d7cb-4cab-82ed-8de9de66b092}\\AC\\Temp\\tmp2n0a7_jt\\editedmeta'
+
+======================================================================
+ERROR: test_rejects_modified_schedule (test_run_safety.RunDirectoryTests.test_rejects_modified_schedule)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1011, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+FileNotFoundError: [WinError 3] The system cannot find the path specified: 'C:\\Users\\Admin\\AppData\\Local\\Packages\\sandbox.{c8b1de1b-d7cb-4cab-82ed-8de9de66b092}\\AC\\Temp\\tmpais09wue\\editschedule\\raw'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Akshat\LadderLens_v6\LadderLens_v6\main\tests\test_run_safety.py", line 176, in test_rejects_modified_schedule
+    r = fake_run(self.tmp / "editschedule")
+  File "D:\Akshat\LadderLens_v6\LadderLens_v6\main\tests\test_run_safety.py", line 33, in fake_run
+    (root / "raw").mkdir(parents=True)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1015, in mkdir
+    self.parent.mkdir(parents=True, exist_ok=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1011, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+PermissionError: [WinError 5] Access is denied: 'C:\\Users\\Admin\\AppData\\Local\\Packages\\sandbox.{c8b1de1b-d7cb-4cab-82ed-8de9de66b092}\\AC\\Temp\\tmpais09wue\\editschedule'
+
+======================================================================
+ERROR: test_rejects_run_without_hashed_schedule (test_run_safety.RunDirectoryTests.test_rejects_run_without_hashed_schedule)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1011, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+FileNotFoundError: [WinError 3] The system cannot find the path specified: 'C:\\Users\\Admin\\AppData\\Local\\Packages\\sandbox.{c8b1de1b-d7cb-4cab-82ed-8de9de66b092}\\AC\\Temp\\tmpvcor0p0b\\noschedule\\raw'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Akshat\LadderLens_v6\LadderLens_v6\main\tests\test_run_safety.py", line 183, in test_rejects_run_without_hashed_schedule
+    r = fake_run(self.tmp / "noschedule")
+  File "D:\Akshat\LadderLens_v6\LadderLens_v6\main\tests\test_run_safety.py", line 33, in fake_run
+    (root / "raw").mkdir(parents=True)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1015, in mkdir
+    self.parent.mkdir(parents=True, exist_ok=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1011, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+PermissionError: [WinError 5] Access is denied: 'C:\\Users\\Admin\\AppData\\Local\\Packages\\sandbox.{c8b1de1b-d7cb-4cab-82ed-8de9de66b092}\\AC\\Temp\\tmpvcor0p0b\\noschedule'
+
+======================================================================
+ERROR: test_rejects_stale_file_from_earlier_run (test_run_safety.RunDirectoryTests.test_rejects_stale_file_from_earlier_run)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1011, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+FileNotFoundError: [WinError 3] The system cannot find the path specified: 'C:\\Users\\Admin\\AppData\\Local\\Packages\\sandbox.{c8b1de1b-d7cb-4cab-82ed-8de9de66b092}\\AC\\Temp\\tmpug3_0_vr\\stale\\raw'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Akshat\LadderLens_v6\LadderLens_v6\main\tests\test_run_safety.py", line 113, in test_rejects_stale_file_from_earlier_run
+    r = fake_run(self.tmp / "stale")
+  File "D:\Akshat\LadderLens_v6\LadderLens_v6\main\tests\test_run_safety.py", line 33, in fake_run
+    (root / "raw").mkdir(parents=True)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1015, in mkdir
+    self.parent.mkdir(parents=True, exist_ok=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1011, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+PermissionError: [WinError 5] Access is denied: 'C:\\Users\\Admin\\AppData\\Local\\Packages\\sandbox.{c8b1de1b-d7cb-4cab-82ed-8de9de66b092}\\AC\\Temp\\tmpug3_0_vr\\stale'
+
+======================================================================
+ERROR: test_rejects_unexpected_metadata (test_run_safety.RunDirectoryTests.test_rejects_unexpected_metadata)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1011, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+FileNotFoundError: [WinError 3] The system cannot find the path specified: 'C:\\Users\\Admin\\AppData\\Local\\Packages\\sandbox.{c8b1de1b-d7cb-4cab-82ed-8de9de66b092}\\AC\\Temp\\tmpkdxy5q99\\extrameta\\raw'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Akshat\LadderLens_v6\LadderLens_v6\main\tests\test_run_safety.py", line 139, in test_rejects_unexpected_metadata
+    r = fake_run(self.tmp / "extrameta")
+  File "D:\Akshat\LadderLens_v6\LadderLens_v6\main\tests\test_run_safety.py", line 33, in fake_run
+    (root / "raw").mkdir(parents=True)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1015, in mkdir
+    self.parent.mkdir(parents=True, exist_ok=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1011, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+PermissionError: [WinError 5] Access is denied: 'C:\\Users\\Admin\\AppData\\Local\\Packages\\sandbox.{c8b1de1b-d7cb-4cab-82ed-8de9de66b092}\\AC\\Temp\\tmpkdxy5q99\\extrameta'
+
+======================================================================
+ERROR: test_rejects_unfinished_run (test_run_safety.RunDirectoryTests.test_rejects_unfinished_run)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1011, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+FileNotFoundError: [WinError 3] The system cannot find the path specified: 'C:\\Users\\Admin\\AppData\\Local\\Packages\\sandbox.{c8b1de1b-d7cb-4cab-82ed-8de9de66b092}\\AC\\Temp\\tmpdmqknbfr\\partial\\raw'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Akshat\LadderLens_v6\LadderLens_v6\main\tests\test_run_safety.py", line 126, in test_rejects_unfinished_run
+    r = fake_run(self.tmp / "partial", status="running")
+  File "D:\Akshat\LadderLens_v6\LadderLens_v6\main\tests\test_run_safety.py", line 33, in fake_run
+    (root / "raw").mkdir(parents=True)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1015, in mkdir
+    self.parent.mkdir(parents=True, exist_ok=True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python314\Lib\pathlib\__init__.py", line 1011, in mkdir
+    os.mkdir(self, mode)
+    ~~~~~~~~^^^^^^^^^^^^
+PermissionError: [WinError 5] Access is denied: 'C:\\Users\\Admin\\AppData\\Local\\Packages\\sandbox.{c8b1de1b-d7cb-4cab-82ed-8de9de66b092}\\AC\\Temp\\tmpdmqknbfr\\partial'
+
+----------------------------------------------------------------------
+Ran 20 tests in 0.135s
+
+FAILED (errors=17, skipped=1)
+
+exit_code=1
+compileall_exit_code=0

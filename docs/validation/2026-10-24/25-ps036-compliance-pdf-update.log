@@ -1,0 +1,15 @@
+PS-036 compliance mapping and PDF update - 24 October 2026
+
+Input: two-page official assignment supplied at C:/Users/Admin/OneDrive/Desktop/PS-036.pdf. A byte-identical copy is retained in docs/reference/PS-036.pdf.
+
+Changes:
+- Added docs/PS036-COMPLIANCE.md with a technical-requirement and expected-deliverable evidence matrix.
+- Updated README, methodology, progress, audit and final verification records to note that the assignment is supplied; prior “missing PS-036 statement” claims are superseded.
+- Updated the structured 11-page PDF to reflect PS-036 review, remaining Docker/team actions, the private-repository/collaborator/ownership/upload steps, and the prototype demonstration with pseudocode.
+- No benchmark code, raw measurements, result tables or charts changed.
+
+PDF generation: python .build/make_structured_pdf.py; exit 0.
+Text validation: pypdf confirms 11 pages, PS-036 review present, stale “statement was not supplied” phrasing absent, repository ownership-transfer and pseudocode requirements present.
+Rendering: all pages generated. Pages 2, 9, 10 and 11 re-inspected after edits. No clipping or overlap observed. Poppler emitted its existing “No display font for Symbol” warning for an embedded chart; chart remains legible.
+
+Scope: this establishes that the supplied assignment was reviewed and the local PDF/docs updated. It does not establish Docker validation or completion of team-controlled GitHub and mentor-demo deliverables.

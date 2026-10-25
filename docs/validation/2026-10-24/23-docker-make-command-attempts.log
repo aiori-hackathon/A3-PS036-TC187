@@ -1,0 +1,32 @@
+LadderLens requested image validation commands - 24 October 2026
+Host: Windows PowerShell
+
+> make build
+The term 'make' is not recognized as a name of a cmdlet, function, script file, or executable program.
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+exit_code=command_unavailable
+
+> make harness
+The term 'make' is not recognized as a name of a cmdlet, function, script file, or executable program.
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+exit_code=command_unavailable
+
+> make smoke
+The term 'make' is not recognized as a name of a cmdlet, function, script file, or executable program.
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+exit_code=command_unavailable
+
+> make verify
+The term 'make' is not recognized as a name of a cmdlet, function, script file, or executable program.
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+exit_code=command_unavailable
+
+> make test
+The term 'make' is not recognized as a name of a cmdlet, function, script file, or executable program.
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+exit_code=command_unavailable
+
+> docker --version
+The term 'docker' is not recognized as a name of a cmdlet, function, script file, or executable program.
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+exit_code=command_unavailable

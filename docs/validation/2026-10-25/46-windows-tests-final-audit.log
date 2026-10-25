@@ -1,0 +1,27 @@
+test_second_run_into_same_directory_is_refused (test_run_safety.EndToEndTests.test_second_run_into_same_directory_is_refused) ... skipped 'the harness binaries are Linux executables; run this test in Docker'
+test_accepts_new_or_empty_directory (test_run_safety.RunDirectoryTests.test_accepts_new_or_empty_directory) ... ok
+test_complete_run_loads (test_run_safety.RunDirectoryTests.test_complete_run_loads) ... ok
+test_config_digest_covers_every_benchmark_field (test_run_safety.RunDirectoryTests.test_config_digest_covers_every_benchmark_field) ... ok
+test_failed_invocations_are_not_reported_as_complete (test_run_safety.RunDirectoryTests.test_failed_invocations_are_not_reported_as_complete) ... ok
+test_refuses_non_empty_directory (test_run_safety.RunDirectoryTests.test_refuses_non_empty_directory) ... ok
+test_refuses_plan_made_with_another_configuration (test_run_safety.RunDirectoryTests.test_refuses_plan_made_with_another_configuration) ... ok
+test_rejects_directory_without_manifest (test_run_safety.RunDirectoryTests.test_rejects_directory_without_manifest) ... ok
+test_rejects_manifest_without_hashes (test_run_safety.RunDirectoryTests.test_rejects_manifest_without_hashes) ... ok
+test_rejects_missing_metadata (test_run_safety.RunDirectoryTests.test_rejects_missing_metadata) ... ok
+test_rejects_missing_recorded_file (test_run_safety.RunDirectoryTests.test_rejects_missing_recorded_file) ... ok
+test_rejects_modified_cache_summary (test_run_safety.RunDirectoryTests.test_rejects_modified_cache_summary) ... ok
+test_rejects_modified_measurements (test_run_safety.RunDirectoryTests.test_rejects_modified_measurements) ... ok
+test_rejects_modified_metadata (test_run_safety.RunDirectoryTests.test_rejects_modified_metadata) ... ok
+test_rejects_modified_schedule (test_run_safety.RunDirectoryTests.test_rejects_modified_schedule) ... ok
+test_rejects_run_without_hashed_schedule (test_run_safety.RunDirectoryTests.test_rejects_run_without_hashed_schedule) ... ok
+test_rejects_stale_file_from_earlier_run (test_run_safety.RunDirectoryTests.test_rejects_stale_file_from_earlier_run) ... ok
+test_rejects_unexpected_metadata (test_run_safety.RunDirectoryTests.test_rejects_unexpected_metadata) ... ok
+test_rejects_unfinished_run (test_run_safety.RunDirectoryTests.test_rejects_unfinished_run) ... ok
+test_report_uses_the_configuration_recorded_in_the_run (test_run_safety.RunDirectoryTests.test_report_uses_the_configuration_recorded_in_the_run) ... ok
+test_update_readme_preserves_utf8_content (test_run_safety.RunDirectoryTests.test_update_readme_preserves_utf8_content) ... ok
+
+----------------------------------------------------------------------
+Ran 21 tests in 0.218s
+
+OK (skipped=1)
+compileall exit=0

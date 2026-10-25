@@ -1,0 +1,33 @@
+{
+  "about": "Exact sizes for SLH-DSA-SHA2-128s-MTL-SHA2-128 with Verisign MTL v1.3.1 (commit 7cef019). Sizes are deterministic for a given algorithm and library version; `make verify` checks them in the pinned image. Condensed maxima equal the bound in draft-harvey-cfrg-mtl-mode-09 section 12; the plain signature size is the SLH-DSA-SHA2-128s parameter set in FIPS 205.",
+  "sizes": {
+    "plain_signature": 7856,
+    "public_key": 32,
+    "mtl": {
+      "1": {
+        "ladder": 7928,
+        "condensed_min": 76,
+        "condensed_max": 76,
+        "full_max": 8004
+      },
+      "10": {
+        "ladder": 7960,
+        "condensed_min": 92,
+        "condensed_max": 124,
+        "full_max": 8084
+      },
+      "100": {
+        "ladder": 7992,
+        "condensed_min": 108,
+        "condensed_max": 172,
+        "full_max": 8164
+      },
+      "1000": {
+        "ladder": 8088,
+        "condensed_min": 124,
+        "condensed_max": 220,
+        "full_max": 8308
+      }
+    }
+  }
+}

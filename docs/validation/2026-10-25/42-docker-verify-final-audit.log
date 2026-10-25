@@ -1,0 +1,61 @@
+docker run --rm -v "D:/Akshat/LadderLens_v6/LadderLens_v6/main":/work -w /work ladderlens:latest python3 -m ladderlens --config configs/benchmark.toml verify
+verification artifacts: results/verify-fhlrg_8s
+cryptographic self-test (harness/selftest.c)
+  ok    plain: valid signature accepted
+  ok    plain: altered message rejected
+  ok    plain: altered signature rejected
+  ok    plain: truncated signature rejected
+  ok    mtl: full signature accepted (cold)
+  ok    mtl: condensed signature accepted on verified ladder
+  ok    mtl: full signature on another record rejected
+  ok    mtl: condensed signature on another record rejected
+  ok    mtl: altered authentication path (last byte) rejected
+  ok    mtl: altered authentication path (inner byte) rejected
+  ok    mtl: altered ladder signature rejected
+  ok    mtl: full signature with altered ladder rejected
+  ok    mtl: ladder signed by another key rejected
+  ok    mtl: condensed signature against another key's ladder rejected
+  ok    mtl: truncated condensed signature rejected
+  ok    mtl: truncated full signature rejected
+  ok    mtl: empty signature rejected
+  ok    mtl: malformed signature rejected
+  ok    mtl: record not covered by the ladder rejected
+  ok    self-test ran every case and exited cleanly: 19 cases
+harness output
+  ok    mtl_1: CSV parses with the documented 19 columns
+  ok    mtl_10: CSV parses with the documented 19 columns
+  ok    mtl_100: CSV parses with the documented 19 columns
+  ok    mtl_1000: CSV parses with the documented 19 columns
+  ok    plain_2: CSV parses with the documented 19 columns
+  ok    mtl1_2: CSV parses with the documented 19 columns
+  ok    sample: CSV parses with the documented 19 columns
+  ok    sampled run times K=2 of N=10 records
+signature sizes (exact)
+  ok    plain SLH-DSA signature: 7856 B
+  ok    public key: 32 B
+  ok    MTL batch-of-one full signature: 8004 B
+  ok    MTL N=1: ladder, condensed min/max, full max: (7928, 76, 76, 8004)
+  ok    MTL N=1: condensed max equals draft section 12 bound: bound 76 B
+  ok    MTL N=10: ladder, condensed min/max, full max: (7960, 92, 124, 8084)
+  ok    MTL N=10: condensed max equals draft section 12 bound: bound 124 B
+  ok    MTL N=100: ladder, condensed min/max, full max: (7992, 108, 172, 8164)
+  ok    MTL N=100: condensed max equals draft section 12 bound: bound 172 B
+  ok    MTL N=1000: ladder, condensed min/max, full max: (8088, 124, 220, 8308)
+  ok    MTL N=1000: condensed max equals draft section 12 bound: bound 220 B
+verification paths
+  ok    every record verified cold and warm
+  ok    warm path skips the per-record SLH-DSA check
+  ok    arms A and B report no warm path
+cache replay
+  ok    TTL 100 over 600 queries gives exactly 6 misses: 6
+  ok    hits + misses = queries
+  ok    append-only growth: no backward-compatibility failures: 136 answers verified on an older ladder
+DNS encoding
+  ok    fixture signing input matches dnspython's DNSSEC encoding: 200/200 RRsets
+  ok    plain response exceeds 1,232 B; condensed response fits: 7,970 B vs 191 B
+committed final results
+  ok    results/final N=10 ladder matches
+  ok    results/final N=100 ladder matches
+  ok    results/final N=1000 ladder matches
+
+verify: all checks passed

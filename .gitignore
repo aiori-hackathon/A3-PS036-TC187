@@ -1,15 +1,23 @@
-# Generated benchmark output
-results/raw/
-results/summary/
-results/charts/
+# Build output
+harness/bin/
+
+# Generated workloads (deterministic from configs/benchmark.toml; recreated on demand)
+fixtures/
+
+# Benchmark output: scratch runs stay local; only the final run is committed
+results/*
+!results/README.md
+!results/final/
 
 # Python
 __pycache__/
 *.pyc
 .venv/
 
-# Local scratch
+# Local tools and reference material
+.freebuff/
+mtl-ref/
 *.log
 
-# Vendored reference implementation is a standalone clone (pinned by commit SHA; re-clone per README)
-mtl-ref/
+# Validation evidence is committed on purpose
+!docs/validation/**/*.log

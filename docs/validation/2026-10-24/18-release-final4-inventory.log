@@ -1,0 +1,10 @@
+Release archive inventory and sensitive-pattern check - 24 October 2026
+
+Archive tested: LadderLens_v6-release-2026-10-24-final4.zip
+ZIP entries: 558
+Required sources, configuration, fixture, results/report, methodology, task register, independent audit, provisional PDF and current Windows-test log: present.
+Excluded build scratch, Git metadata, generated C binaries, Python caches and non-final scratch runs: 0 entries.
+Sensitive-pattern scan of textual source/docs/config entries (private-key headers, common AWS access-key form, GitHub token forms): no matches.
+Markdown local target scan on workspace documentation: no missing relative targets.
+
+This scan is a narrow pattern check, not a general security review.

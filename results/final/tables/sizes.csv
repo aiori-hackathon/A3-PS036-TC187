@@ -1,0 +1,4 @@
+n,plain_signature,mtl1_full_signature,mtl_condensed_min,mtl_condensed_median,mtl_condensed_max,mtl_signed_ladder,mtl_full_signature_max,public_key
+10,7856,8004,92.0,124.0,124.0,7960,8084.0,32
+100,7856,8004,108.0,172.0,172.0,7992,8164.0,32
+1000,7856,8004,124.0,220.0,220.0,8088,8308.0,32

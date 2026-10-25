@@ -1,0 +1,5 @@
+$ make bench RUN=results/runs/20261023-replica-full    # reuse of a non-empty directory
+python3 -m ladderlens --config configs/benchmark.toml run --out results/runs/20261023-replica-full
+error: refusing to write into results/runs/20261023-replica-full: it already contains files. Runs are never resumed or merged. Choose a new directory (for example RUN=results/runs/<name>), or move the old run away first.
+make: *** [Makefile:65: bench] Error 1
+exit status: 2

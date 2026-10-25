@@ -1,0 +1,3 @@
+docker run --rm -v "D:/Akshat/LadderLens_v6/LadderLens_v6/main":/work -w /work ladderlens:latest python3 -m ladderlens --config configs/benchmark.toml report results/final --readme
+results/final/report.md
+README.md results block updated

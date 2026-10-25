@@ -1,0 +1,7 @@
+Retained harness binary provenance check - 24 October 2026
+
+Local Linux ELF harness binary hashes were compared with `results/final/manifest.json`:
+bench: 7b936dbc1862f2861760b85e94d2abb53dd11a6ba3714328964d2632ef65b23c - MATCH
+cachesim: 5d54c03bc6d1da9c269a9ccd3a7e28ccbbf89bbc4db4faac95d6a4e1f9ebb93e - MATCH
+
+The hash match establishes that the local binaries equal the binaries recorded by this run manifest. It does not establish the source revision or clean-tree state: the supplied workspace has no `.git`, and the manifest records null commit/dirty values. The binaries are Linux ELF and were not executed on Windows in this check.

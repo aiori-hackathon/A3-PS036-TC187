@@ -1,0 +1,9 @@
+Release archive validation - 24 October 2026
+
+Archive: LadderLens_v6-release-2026-10-24-final5.zip
+SHA-256: 614d8ca5e2c14c02b2cf6698e6da6e29c454292ab3343e32a8d23af389e45ddd
+ZIP entries: 560; excluded build/git/cache/binary/scratch entries: 0. Required audit, final PDF, source, fixture, result report and validation files present.
+Extracted-copy Python suite: 19 passed, 1 skipped (harness binary omitted; no failures).
+Python compileall: PASS. Retained-run validator: PASS. Retained result hashes: 463/463 PASS.
+
+This verifies the portable source package and retained result data. It does not build Docker or execute the Linux C harness.

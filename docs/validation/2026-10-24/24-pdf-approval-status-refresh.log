@@ -1,0 +1,18 @@
+LadderLens structured PDF status refresh - 24 October 2026
+
+Edit: updated the 11-page provisional deck to state that the student reports mentor approval of the current methodology choices, while clearly noting that the written message is not retained. Removed language saying approvals are pending. Docker and missing official PS-036/team details remain open.
+
+Generation: python .build/make_structured_pdf.py
+Exit status: 0
+Output: docs/LadderLens-PS036-structured-provisional.pdf
+
+Text validation (pypdf):
+- Pages: 11
+- Extracted characters: 9,173
+- Old phrases “methodology approval pending”, “three experimental choices await”, “approve dataset sizes”: absent
+- Student-reported approval wording: present
+- Docker not-verified wording: present
+
+Visual validation: all 11 pages rendered with Poppler at 110 DPI. Pages 1, 2, 4, 9, 10 and 11 inspected after the text changes; page 6 and remaining unchanged pages retained prior visual review. No clipping or overlap observed. Poppler emitted its existing “No display font for Symbol” warning for an embedded chart; the chart renders legibly.
+
+Scope: this verifies the generated provisional PDF's text/layout. It does not establish official PS-036 compliance, written mentor evidence, or Docker validation.

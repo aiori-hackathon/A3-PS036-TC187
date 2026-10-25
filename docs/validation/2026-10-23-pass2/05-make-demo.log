@@ -1,0 +1,28 @@
+$ make demo
+/bin/sh scripts/demo.sh
+
+== Environment
+algorithm      SLH-DSA-SHA2-128s-MTL-SHA2-128
+MTL reference  commit 7cef0191da55, built with -O2 -g -fPIC
+
+== 1. A synthetic signed zone
+1450 RRsets (A 624, TXT 286, AAAA 337, MX 203); signing input 73 to 203 bytes per RRset
+
+== 2. Arm C: sign 100 RRsets as one MTL batch (one SLH-DSA signature in total)
+batch signed in 0.56 s; ladder 7,992 B; condensed signatures 108 to 172 B
+
+== 3. Arm A: the same zone with plain SLH-DSA (5 of the 100 RRsets timed)
+0.51 s per signature, so about 51 s for all 100 (extrapolated); each signature 7,856 B
+
+== 4. What one DNS answer weighs
+plain SLH-DSA                    7,970 B  exceeds 1,232 B
+MTL full (no ladder cached)      8,279 B  exceeds 1,232 B
+MTL condensed (ladder cached)      287 B  fits 1,232 B
+verify: plain 0.50 ms, MTL cold 0.55 ms, MTL warm 3.3 µs per record
+
+== 5. One resolver, 2,000 queries, the zone grows twice
+1,997 hits, 3 ladder fetches, 177 B of signature per query (plain: 7,856 B); 17 answers verified on an older ladder after growth
+
+== Next
+make plan && make bench RUN=results/final && make report RUN=results/final
+exit status: 0

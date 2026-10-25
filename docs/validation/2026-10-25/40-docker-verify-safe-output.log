@@ -1,0 +1,17 @@
+docker run --rm -v "D:/Akshat/LadderLens_v6/LadderLens_v6/main":/work -w /work ladderlens:latest python3 -m ladderlens --config configs/benchmark.toml verify
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/work/ladderlens/__main__.py", line 77, in <module>
+    sys.exit(main())
+             ~~~~^^
+  File "/work/ladderlens/__main__.py", line 13, in main
+    return _main(argv)
+  File "/work/ladderlens/__main__.py", line 57, in _main
+    return verify.main(cfg)
+           ~~~~~~~~~~~^^^^^
+  File "/work/ladderlens/verify.py", line 39, in main
+    work = Path(tempfile.mkdtemp(prefix="verify-", dir=config.RESULTS))
+           ^^^^
+NameError: name 'Path' is not defined. Did you mean: 'math'?
+make: *** [Makefile:56: verify] Error 1
